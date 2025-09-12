@@ -1,9 +1,9 @@
 // API Routes para operaciones específicas de proyecto
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getProjectById, updateProject, deleteProject } from '@/lib/storage';
-import { calculateProjectProgress, validateProjectData } from '@/lib/projects';
-import { UpdateProjectData } from '@/types/project';
+import { SupabaseService } from '@/lib/supabase-service';
+import { validateProjectData } from '@/lib/projects';
+import { UpdateProjectData, CreateProjectData } from '@/types/project';
 
 // GET /api/projects/[id] - Obtener un proyecto específico
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const project = await getProjectById(id);
+    const project = await SupabaseService.getProject(id);
 
     if (!project) {
       return NextResponse.json(
@@ -21,13 +21,7 @@ export async function GET(
       );
     }
 
-    // Recalcular progreso
-    const projectWithProgress = {
-      ...project,
-      progress: calculateProjectProgress(project)
-    };
-
-    return NextResponse.json(projectWithProgress);
+    return NextResponse.json(project);
   } catch (error) {
     console.error('Error fetching project:', error);
     return NextResponse.json(
@@ -46,23 +40,49 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json() as UpdateProjectData;
 
-    // Obtener proyecto actual
-    const existingProject = await getProjectById(id);
-    if (!existingProject) {
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
+    // Check if it's a simple status or phase update
+    if (body.status !== undefined && Object.keys(body).length === 1) {
+      const updatedProject = await SupabaseService.updateProjectStatus(id, body.status);
+      return NextResponse.json(updatedProject);
     }
 
-    // Validar datos si se están actualizando campos críticos
-    if (body.name !== undefined || body.deadline !== undefined || 
-        body.status !== undefined || body.phase !== undefined) {
+    if (body.phase !== undefined && Object.keys(body).length === 1) {
+      const updatedProject = await SupabaseService.updateProjectPhase(id, body.phase);
+      return NextResponse.json(updatedProject);
+    }
+
+    // For complex updates, convert to CreateProjectData format if needed
+    let updateData: Partial<CreateProjectData> = {};
+    
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.deadline !== undefined) updateData.deadline = body.deadline.toISOString();
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.phase !== undefined) updateData.phase = body.phase;
+    if (body.tasks !== undefined) {
+      updateData.tasks = body.tasks.map(task => ({
+        name: task.name,
+        completed: task.completed
+      }));
+    }
+
+    // Validate data if critical fields are being updated
+    if (updateData.name !== undefined || updateData.deadline !== undefined || 
+        updateData.status !== undefined || updateData.phase !== undefined) {
+      const existingProject = await SupabaseService.getProject(id);
+      if (!existingProject) {
+        return NextResponse.json(
+          { error: 'Project not found' },
+          { status: 404 }
+        );
+      }
+
       const dataToValidate = {
-        name: body.name ?? existingProject.name,
-        deadline: body.deadline ?? existingProject.deadline,
-        status: body.status ?? existingProject.status,
-        phase: body.phase ?? existingProject.phase
+        name: updateData.name ?? existingProject.name,
+        deadline: updateData.deadline ?? existingProject.deadline.toISOString(),
+        status: updateData.status ?? existingProject.status,
+        phase: updateData.phase ?? existingProject.phase,
+        tasks: updateData.tasks ?? existingProject.tasks.map(t => ({ name: t.name, completed: t.completed }))
       };
       
       const errors = validateProjectData(dataToValidate);
@@ -74,22 +94,9 @@ export async function PATCH(
       }
     }
 
-    // Actualizar proyecto
-    const updatedProject = await updateProject(id, body);
-    if (!updatedProject) {
-      return NextResponse.json(
-        { error: 'Failed to update project' },
-        { status: 500 }
-      );
-    }
-
-    // Recalcular progreso
-    const projectWithProgress = {
-      ...updatedProject,
-      progress: calculateProjectProgress(updatedProject)
-    };
-
-    return NextResponse.json(projectWithProgress);
+    // Update project
+    const updatedProject = await SupabaseService.updateProject(id, updateData);
+    return NextResponse.json(updatedProject);
   } catch (error) {
     console.error('Error updating project:', error);
     return NextResponse.json(
@@ -106,15 +113,17 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const deleted = await deleteProject(id);
-
-    if (!deleted) {
+    
+    // Check if project exists
+    const existingProject = await SupabaseService.getProject(id);
+    if (!existingProject) {
       return NextResponse.json(
         { error: 'Project not found' },
         { status: 404 }
       );
     }
 
+    await SupabaseService.deleteProject(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting project:', error);
