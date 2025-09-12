@@ -49,17 +49,17 @@ export class SupabaseService {
     }
 
     // Group tasks by project_id
-    const tasksByProject = tasks?.reduce((acc, task) => {
+    const tasksByProject = (tasks || []).reduce((acc, task) => {
       if (!acc[task.project_id]) {
         acc[task.project_id] = [];
       }
       acc[task.project_id].push(dbRowToTask(task));
       return acc;
-    }, {} as Record<string, Task[]>) || {};
+    }, {} as Record<string, Task[]>);
 
-    return projects?.map(project => 
+    return (projects || []).map(project => 
       dbRowToProject(project, tasksByProject[project.id] || [])
-    ) || [];
+    );
   }
 
   // Get a single project with its tasks
@@ -86,7 +86,7 @@ export class SupabaseService {
       throw new Error(`Error fetching tasks: ${tasksError.message}`);
     }
 
-    const projectTasks = tasks?.map(dbRowToTask) || [];
+    const projectTasks = (tasks || []).map(dbRowToTask);
     return dbRowToProject(project, projectTasks);
   }
 
@@ -140,7 +140,7 @@ export class SupabaseService {
         throw new Error(`Error creating tasks: ${tasksError.message}`);
       }
 
-      const projectTasks = tasks?.map(dbRowToTask) || [];
+      const projectTasks = (tasks || []).map(dbRowToTask);
       return dbRowToProject(project, projectTasks);
     }
 
