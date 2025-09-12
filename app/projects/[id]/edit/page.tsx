@@ -63,7 +63,7 @@ export default function EditProjectPage() {
           phase: data.phase,
           tasks: data.tasks.map(task => ({
             ...task,
-            id: task.id || Math.random().toString(36).substring(2) + Date.now().toString(36),
+            id: Math.random().toString(36).substring(2) + Date.now().toString(36),
             createdAt: new Date()
           }))
         }),
