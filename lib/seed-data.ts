@@ -12,6 +12,7 @@ export const sampleProjects: Omit<Project, 'progress'>[] = [
     name: 'E-commerce Full-Stack App',
     description: 'Plataforma de e-commerce con React/Next.js, Node.js, PostgreSQL y Stripe para pagos.',
     owner_id: DEFAULT_OWNER_ID,
+    requires_approval: true,
     tasks: [
       {
         id: generateId(),
@@ -73,6 +74,7 @@ export const sampleProjects: Omit<Project, 'progress'>[] = [
     name: 'Blog Personal con CMS',
     description: 'Blog personal con Next.js, MDX para contenido y dashboard para gestión de posts.',
     owner_id: DEFAULT_OWNER_ID,
+    requires_approval: false,
     tasks: [
       {
         id: generateId(),
@@ -122,6 +124,7 @@ export const sampleProjects: Omit<Project, 'progress'>[] = [
     name: 'API REST para SaaS',
     description: 'API robusta para aplicación SaaS con autenticación, subscripciones y analytics.',
     owner_id: DEFAULT_OWNER_ID,
+    requires_approval: true,
     tasks: [
       {
         id: generateId(),
@@ -183,6 +186,7 @@ export const sampleProjects: Omit<Project, 'progress'>[] = [
     name: 'Dashboard Analytics',
     description: 'Dashboard interactivo para visualización de datos con React, D3.js y WebSockets.',
     owner_id: DEFAULT_OWNER_ID,
+    requires_approval: false,
     tasks: [
       {
         id: generateId(),
@@ -226,6 +230,7 @@ export const sampleProjects: Omit<Project, 'progress'>[] = [
     name: 'App Móvil React Native',
     description: 'Aplicación móvil multiplataforma para gestión de tareas con sincronización offline.',
     owner_id: DEFAULT_OWNER_ID,
+    requires_approval: true,
     tasks: [
       {
         id: generateId(),
