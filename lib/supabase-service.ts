@@ -1,13 +1,14 @@
 import { supabase } from './supabase';
 import { Project, CreateProjectData, Task } from '@/types/project';
 import { calculateProjectProgress } from './projects';
+import { Database } from '@/types/database';
 
 // Convert database row to Project type
-function dbRowToProject(row: any, tasks: Task[] = []): Project {
+function dbRowToProject(row: Database['public']['Tables']['projects']['Row'], tasks: Task[] = []): Project {
   return {
     id: row.id,
     name: row.name,
-    description: row.description,
+    description: row.description || undefined,
     deadline: new Date(row.deadline),
     status: row.status,
     phase: row.phase,
@@ -19,7 +20,7 @@ function dbRowToProject(row: any, tasks: Task[] = []): Project {
 }
 
 // Convert database row to Task type
-function dbRowToTask(row: any): Task {
+function dbRowToTask(row: Database['public']['Tables']['tasks']['Row']): Task {
   return {
     id: row.id,
     name: row.name,
@@ -49,7 +50,7 @@ export class SupabaseService {
     }
 
     // Group tasks by project_id
-    const tasksByProject = (tasks || []).reduce((acc, task) => {
+    const tasksByProject = (tasks || []).reduce((acc: Record<string, Task[]>, task: Database['public']['Tables']['tasks']['Row']) => {
       if (!acc[task.project_id]) {
         acc[task.project_id] = [];
       }
@@ -57,7 +58,7 @@ export class SupabaseService {
       return acc;
     }, {} as Record<string, Task[]>);
 
-    return (projects || []).map(project => 
+    return (projects || []).map((project: Database['public']['Tables']['projects']['Row']) => 
       dbRowToProject(project, tasksByProject[project.id] || [])
     );
   }
@@ -106,16 +107,18 @@ export class SupabaseService {
     const progress = calculateProjectProgress(tempProject);
 
     // Insert project
-    const { data: project, error: projectError } = await supabase
+    const projectInsert: Database['public']['Tables']['projects']['Insert'] = {
+      name: data.name,
+      description: data.description,
+      deadline: data.deadline,
+      status: data.status,
+      phase: data.phase,
+      progress
+    };
+
+    const { data: project, error: projectError } = await (supabase as any)
       .from('projects')
-      .insert({
-        name: data.name,
-        description: data.description,
-        deadline: data.deadline,
-        status: data.status,
-        phase: data.phase,
-        progress
-      })
+      .insert(projectInsert)
       .select()
       .single();
 
@@ -125,13 +128,13 @@ export class SupabaseService {
 
     // Insert tasks
     if (data.tasks.length > 0) {
-      const tasksToInsert = data.tasks.map(task => ({
-        project_id: project.id,
+      const tasksToInsert: Database['public']['Tables']['tasks']['Insert'][] = data.tasks.map(task => ({
+        project_id: (project as any).id,
         name: task.name,
         completed: task.completed
       }));
 
-      const { data: tasks, error: tasksError } = await supabase
+      const { data: tasks, error: tasksError } = await (supabase as any)
         .from('tasks')
         .insert(tasksToInsert)
         .select();
@@ -141,10 +144,10 @@ export class SupabaseService {
       }
 
       const projectTasks = (tasks || []).map(dbRowToTask);
-      return dbRowToProject(project, projectTasks);
+      return dbRowToProject(project as any, projectTasks);
     }
 
-    return dbRowToProject(project, []);
+    return dbRowToProject(project as any, []);
   }
 
   // Update a project
@@ -179,13 +182,13 @@ export class SupabaseService {
         .eq('project_id', id);
 
       if (updates.tasks.length > 0) {
-        const tasksToInsert = updates.tasks.map(task => ({
+        const tasksToInsert: Database['public']['Tables']['tasks']['Insert'][] = updates.tasks.map(task => ({
           project_id: id,
           name: task.name,
           completed: task.completed
         }));
 
-        await supabase
+        await (supabase as any)
           .from('tasks')
           .insert(tasksToInsert);
       }
@@ -196,7 +199,7 @@ export class SupabaseService {
     }
 
     // Update project
-    const projectUpdates: any = {};
+    const projectUpdates: Database['public']['Tables']['projects']['Update'] = {};
     if (updates.name !== undefined) projectUpdates.name = updates.name;
     if (updates.description !== undefined) projectUpdates.description = updates.description;
     if (updates.deadline !== undefined) projectUpdates.deadline = updates.deadline;
@@ -204,7 +207,7 @@ export class SupabaseService {
     if (updates.phase !== undefined) projectUpdates.phase = updates.phase;
     projectUpdates.progress = progress;
 
-    const { data: project, error: projectError } = await supabase
+    const { data: project, error: projectError } = await (supabase as any)
       .from('projects')
       .update(projectUpdates)
       .eq('id', id)
@@ -216,7 +219,7 @@ export class SupabaseService {
     }
 
     // Get updated project with tasks
-    return await this.getProject(id) || dbRowToProject(project, []);
+    return await this.getProject(id) || dbRowToProject(project as any, []);
   }
 
   // Delete a project
@@ -233,7 +236,7 @@ export class SupabaseService {
 
   // Update project status only
   static async updateProjectStatus(id: string, status: Project['status']): Promise<Project> {
-    const { data: project, error } = await supabase
+    const { data: project, error } = await (supabase as any)
       .from('projects')
       .update({ status })
       .eq('id', id)
@@ -244,7 +247,7 @@ export class SupabaseService {
       throw new Error(`Error updating project status: ${error.message}`);
     }
 
-    return await this.getProject(id) || dbRowToProject(project, []);
+    return await this.getProject(id) || dbRowToProject(project as any, []);
   }
 
   // Update project phase only
@@ -258,7 +261,7 @@ export class SupabaseService {
     const tempProject = { ...currentProject, phase };
     const progress = calculateProjectProgress(tempProject);
 
-    const { data: project, error } = await supabase
+    const { data: project, error } = await (supabase as any)
       .from('projects')
       .update({ phase, progress })
       .eq('id', id)
@@ -269,6 +272,6 @@ export class SupabaseService {
       throw new Error(`Error updating project phase: ${error.message}`);
     }
 
-    return await this.getProject(id) || dbRowToProject(project, []);
+    return await this.getProject(id) || dbRowToProject(project as any, []);
   }
 }
