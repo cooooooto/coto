@@ -49,13 +49,13 @@ export default function ProjectCard({
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 neon-glow-subtle hover:neon-glow">
+    <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 sm:p-6 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 neon-glow-subtle hover:neon-glow">
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex-1 min-w-0">
           <Link 
             href={`/projects/${project.id}`}
-            className="text-lg font-semibold text-white hover:text-green-400 transition-colors hover:neon-text"
+            className="text-base sm:text-lg font-semibold text-white hover:text-green-400 transition-colors hover:neon-text block truncate"
           >
             {project.name}
           </Link>
@@ -68,24 +68,26 @@ export default function ProjectCard({
       </div>
 
       {/* Badges */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
         <StatusBadge status={project.status} />
         <PhaseBadge phase={project.phase} />
-      </div>
-
-      {/* Deadline */}
-      <div className="mb-4">
-        <span className="text-sm text-gray-400">Fecha límite: </span>
-        <span className={`text-sm font-medium ${
-          isOverdue ? 'text-red-400' : 'text-white'
-        }`}>
-          {formatDeadline(project.deadline)}
-        </span>
         {isOverdue && (
-          <span className="ml-2 text-xs bg-red-900 text-red-400 px-2 py-0.5 rounded-full border border-red-600">
+          <span className="text-xs bg-red-900 text-red-400 px-2 py-0.5 rounded-full border border-red-600">
             Vencido
           </span>
         )}
+      </div>
+
+      {/* Deadline */}
+      <div className="mb-3 sm:mb-4">
+        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
+          <span className="text-xs xs:text-sm text-gray-400">Fecha límite:</span>
+          <span className={`text-xs xs:text-sm font-medium ${
+            isOverdue ? 'text-red-400' : 'text-white'
+          }`}>
+            {formatDeadline(project.deadline)}
+          </span>
+        </div>
       </div>
 
       {/* Tasks */}
@@ -129,48 +131,51 @@ export default function ProjectCard({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-4 border-t border-gray-800">
-        {/* Next Status Button */}
-        {getNextStatus(project.status) && (
-          <button
-            onClick={() => handleStatusChange(getNextStatus(project.status)!)}
-            className="text-xs bg-green-900 hover:bg-green-800 text-green-400 px-3 py-1 rounded-full transition-all duration-300 border border-green-600 hover:neon-glow-subtle"
-          >
-            → {getNextStatus(project.status)}
-          </button>
-        )}
+      <div className="pt-3 sm:pt-4 border-t border-gray-800">
+        {/* Mobile: Stack buttons vertically on very small screens */}
+        <div className="flex flex-col xs:flex-row xs:flex-wrap gap-2">
+          {/* Next Status Button */}
+          {getNextStatus(project.status) && (
+            <button
+              onClick={() => handleStatusChange(getNextStatus(project.status)!)}
+              className="text-xs bg-green-900 hover:bg-green-800 text-green-400 px-3 py-2 rounded-full transition-all duration-300 border border-green-600 hover:neon-glow-subtle flex-shrink-0 touch-manipulation"
+            >
+              → {getNextStatus(project.status)}
+            </button>
+          )}
 
-        {/* Next Phase Button */}
-        {getNextPhase(project.phase) && (
-          <button
-            onClick={() => handlePhaseChange(getNextPhase(project.phase)!)}
-            className="text-xs bg-purple-900 hover:bg-purple-800 text-purple-400 px-3 py-1 rounded-full transition-all duration-300 border border-purple-600 hover:neon-glow-subtle"
-          >
-            → {getNextPhase(project.phase)}
-          </button>
-        )}
+          {/* Next Phase Button */}
+          {getNextPhase(project.phase) && (
+            <button
+              onClick={() => handlePhaseChange(getNextPhase(project.phase)!)}
+              className="text-xs bg-purple-900 hover:bg-purple-800 text-purple-400 px-3 py-2 rounded-full transition-all duration-300 border border-purple-600 hover:neon-glow-subtle flex-shrink-0 touch-manipulation"
+            >
+              → {getNextPhase(project.phase)}
+            </button>
+          )}
 
-        {/* Edit Link */}
-        <Link
-          href={`/projects/${project.id}/edit`}
-          className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-full transition-all duration-300 border border-gray-600 hover:border-green-500"
-        >
-          Editar
-        </Link>
-
-        {/* Delete Button */}
-        {onDelete && (
-          <button
-            onClick={() => {
-              if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
-                onDelete(project.id);
-              }
-            }}
-            className="text-xs bg-red-900 hover:bg-red-800 text-red-400 px-3 py-1 rounded-full transition-all duration-300 border border-red-600 hover:neon-glow-subtle ml-auto"
+          {/* Edit Link */}
+          <Link
+            href={`/projects/${project.id}/edit`}
+            className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-2 rounded-full transition-all duration-300 border border-gray-600 hover:border-green-500 flex-shrink-0 touch-manipulation text-center"
           >
-            Eliminar
-          </button>
-        )}
+            ✏️ Editar
+          </Link>
+
+          {/* Delete Button */}
+          {onDelete && (
+            <button
+              onClick={() => {
+                if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+                  onDelete(project.id);
+                }
+              }}
+              className="text-xs bg-red-900 hover:bg-red-800 text-red-400 px-3 py-2 rounded-full transition-all duration-300 border border-red-600 hover:neon-glow-subtle flex-shrink-0 touch-manipulation"
+            >
+              🗑️ Eliminar
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

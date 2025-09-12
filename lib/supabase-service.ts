@@ -1,7 +1,54 @@
-import { supabase } from './supabase';
+import { supabaseAdmin, supabaseConfigValid } from './supabase';
 import { Project, CreateProjectData, Task } from '@/types/project';
 import { calculateProjectProgress } from './projects';
 import { Database } from '@/types/database';
+
+// Enhanced error types for better debugging
+export class SupabaseConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SupabaseConfigError';
+  }
+}
+
+export class SupabaseNetworkError extends Error {
+  constructor(message: string, public originalError?: unknown) {
+    super(message);
+    this.name = 'SupabaseNetworkError';
+  }
+}
+
+export class SupabaseDataError extends Error {
+  constructor(message: string, public code?: string) {
+    super(message);
+    this.name = 'SupabaseDataError';
+  }
+}
+
+// Enhanced logging for debugging
+function logSupabaseOperation(operation: string, details?: any) {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] Supabase ${operation}:`, details || '');
+}
+
+function logSupabaseError(operation: string, error: unknown) {
+  const timestamp = new Date().toISOString();
+  console.error(`[${timestamp}] Supabase ${operation} ERROR:`, {
+    message: error instanceof Error ? error.message : 'Unknown error',
+    stack: error instanceof Error ? error.stack : undefined,
+    type: error?.constructor?.name,
+    details: error
+  });
+}
+
+// Validate Supabase configuration before operations
+function validateConfig() {
+  if (!supabaseConfigValid) {
+    throw new SupabaseConfigError(
+      'Supabase is not properly configured. Please check your environment variables.'
+    );
+  }
+}
 
 // Convert database row to Project type
 function dbRowToProject(row: Database['public']['Tables']['projects']['Row'], tasks: Task[] = []): Project {
@@ -32,43 +79,109 @@ function dbRowToTask(row: Database['public']['Tables']['tasks']['Row']): Task {
 export class SupabaseService {
   // Get all projects with their tasks
   static async getProjects(): Promise<Project[]> {
-    const { data: projects, error: projectsError } = await supabase
-      .from('projects')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      // Validate configuration before attempting operations
+      validateConfig();
+      logSupabaseOperation('getProjects', 'Starting to fetch projects and tasks');
 
-    if (projectsError) {
-      throw new Error(`Error fetching projects: ${projectsError.message}`);
-    }
+      // Fetch projects
+      const { data: projects, error: projectsError } = await supabaseAdmin
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    const { data: tasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select('*');
-
-    if (tasksError) {
-      throw new Error(`Error fetching tasks: ${tasksError.message}`);
-    }
-
-    // Group tasks by project_id
-    const tasksByProject: Record<string, Task[]> = {};
-    if (tasks) {
-      for (const task of tasks) {
-        const taskRow = task as any;
-        if (!tasksByProject[taskRow.project_id]) {
-          tasksByProject[taskRow.project_id] = [];
+      if (projectsError) {
+        logSupabaseError('getProjects - projects query', projectsError);
+        
+        // Check for specific error types
+        if (projectsError.message?.includes('fetch failed') || 
+            projectsError.message?.includes('network') ||
+            projectsError.message?.includes('timeout')) {
+          throw new SupabaseNetworkError(
+            'Failed to connect to database. Please check your internet connection and Supabase configuration.',
+            projectsError
+          );
         }
-        tasksByProject[taskRow.project_id].push(dbRowToTask(taskRow));
+        
+        throw new SupabaseDataError(
+          `Error fetching projects: ${projectsError.message}`, 
+          projectsError.code
+        );
       }
-    }
 
-    return (projects || []).map((project: Database['public']['Tables']['projects']['Row']) => 
-      dbRowToProject(project, tasksByProject[project.id] || [])
-    );
+      logSupabaseOperation('getProjects', `Fetched ${projects?.length || 0} projects`);
+
+      // Fetch tasks
+      const { data: tasks, error: tasksError } = await supabaseAdmin
+        .from('tasks')
+        .select('*');
+
+      if (tasksError) {
+        logSupabaseError('getProjects - tasks query', tasksError);
+        
+        if (tasksError.message?.includes('fetch failed') || 
+            tasksError.message?.includes('network') ||
+            tasksError.message?.includes('timeout')) {
+          throw new SupabaseNetworkError(
+            'Failed to fetch project tasks. Please check your internet connection.',
+            tasksError
+          );
+        }
+        
+        throw new SupabaseDataError(
+          `Error fetching tasks: ${tasksError.message}`, 
+          tasksError.code
+        );
+      }
+
+      logSupabaseOperation('getProjects', `Fetched ${tasks?.length || 0} tasks`);
+
+      // Group tasks by project_id
+      const tasksByProject: Record<string, Task[]> = {};
+      if (tasks) {
+        for (const task of tasks) {
+          const taskRow = task as any;
+          if (!tasksByProject[taskRow.project_id]) {
+            tasksByProject[taskRow.project_id] = [];
+          }
+          tasksByProject[taskRow.project_id].push(dbRowToTask(taskRow));
+        }
+      }
+
+      const result = (projects || []).map((project: Database['public']['Tables']['projects']['Row']) => 
+        dbRowToProject(project, tasksByProject[project.id] || [])
+      );
+
+      logSupabaseOperation('getProjects', `Successfully processed ${result.length} projects with tasks`);
+      return result;
+
+    } catch (error) {
+      // Re-throw our custom errors
+      if (error instanceof SupabaseConfigError || 
+          error instanceof SupabaseNetworkError || 
+          error instanceof SupabaseDataError) {
+        throw error;
+      }
+
+      // Handle unexpected errors
+      logSupabaseError('getProjects - unexpected error', error);
+      
+      if (error instanceof Error && error.message?.includes('fetch failed')) {
+        throw new SupabaseNetworkError(
+          'Database connection failed. This might be due to network issues or incorrect Supabase configuration.',
+          error
+        );
+      }
+
+      throw new SupabaseDataError(
+        `Unexpected error fetching projects: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   // Get a single project with its tasks
   static async getProject(id: string): Promise<Project | null> {
-    const { data: project, error: projectError } = await supabase
+    const { data: project, error: projectError } = await supabaseAdmin
       .from('projects')
       .select('*')
       .eq('id', id)
@@ -81,7 +194,7 @@ export class SupabaseService {
       throw new Error(`Error fetching project: ${projectError.message}`);
     }
 
-    const { data: tasks, error: tasksError } = await supabase
+    const { data: tasks, error: tasksError } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .eq('project_id', id);
@@ -119,7 +232,7 @@ export class SupabaseService {
       progress
     };
 
-    const { data: project, error: projectError } = await (supabase as any)
+    const { data: project, error: projectError } = await (supabaseAdmin as any)
       .from('projects')
       .insert(projectInsert)
       .select()
@@ -137,7 +250,7 @@ export class SupabaseService {
         completed: task.completed
       }));
 
-      const { data: tasks, error: tasksError } = await (supabase as any)
+      const { data: tasks, error: tasksError } = await (supabaseAdmin as any)
         .from('tasks')
         .insert(tasksToInsert)
         .select();
@@ -179,7 +292,7 @@ export class SupabaseService {
       progress = calculateProjectProgress(tempProject);
 
       // Delete existing tasks and insert new ones
-      await supabase
+      await supabaseAdmin
         .from('tasks')
         .delete()
         .eq('project_id', id);
@@ -191,7 +304,7 @@ export class SupabaseService {
           completed: task.completed
         }));
 
-        await (supabase as any)
+        await (supabaseAdmin as any)
           .from('tasks')
           .insert(tasksToInsert);
       }
@@ -210,7 +323,7 @@ export class SupabaseService {
     if (updates.phase !== undefined) projectUpdates.phase = updates.phase;
     projectUpdates.progress = progress;
 
-    const { data: project, error: projectError } = await (supabase as any)
+    const { data: project, error: projectError } = await (supabaseAdmin as any)
       .from('projects')
       .update(projectUpdates)
       .eq('id', id)
@@ -227,7 +340,7 @@ export class SupabaseService {
 
   // Delete a project
   static async deleteProject(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('projects')
       .delete()
       .eq('id', id);
@@ -239,7 +352,7 @@ export class SupabaseService {
 
   // Update project status only
   static async updateProjectStatus(id: string, status: Project['status']): Promise<Project> {
-    const { data: project, error } = await (supabase as any)
+    const { data: project, error } = await (supabaseAdmin as any)
       .from('projects')
       .update({ status })
       .eq('id', id)
@@ -264,7 +377,7 @@ export class SupabaseService {
     const tempProject = { ...currentProject, phase };
     const progress = calculateProjectProgress(tempProject);
 
-    const { data: project, error } = await (supabase as any)
+    const { data: project, error } = await (supabaseAdmin as any)
       .from('projects')
       .update({ phase, progress })
       .eq('id', id)
