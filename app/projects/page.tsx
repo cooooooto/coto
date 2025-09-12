@@ -8,13 +8,21 @@ import { Project, ProjectFilters } from '@/types/project';
 import { sortProjectsByPriority } from '@/lib/projects';
 import ProjectCard from '@/components/ProjectCard';
 import DashboardMetrics from '@/components/DashboardMetrics';
+import RealtimeStatus, { RealtimeStatusIcon } from '@/components/RealtimeStatus';
+import { useRealtimeProjects } from '@/hooks/useRealtimeProjects';
 import Link from 'next/link';
 
 function ProjectsContent() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  // Usar el hook de realtime en lugar del estado local
+  const { 
+    projects, 
+    loading, 
+    error, 
+    refreshProjects, 
+    isConnected 
+  } = useRealtimeProjects();
+  
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showMetrics, setShowMetrics] = useState(true);
   
   const searchParams = useSearchParams();
@@ -28,27 +36,7 @@ function ProjectsContent() {
     search: searchParams.get('search') || undefined
   });
 
-  // Cargar proyectos
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/projects');
-      if (!response.ok) {
-        throw new Error('Error al cargar proyectos');
-      }
-      const data = await response.json();
-      setProjects(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cargar proyectos al montar el componente
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  // Los proyectos se cargan automáticamente con el hook useRealtimeProjects
 
   // Aplicar filtros
   useEffect(() => {
@@ -119,10 +107,11 @@ function ProjectsContent() {
         throw new Error('Error al actualizar el estado');
       }
 
-      const updatedProject = await response.json();
-      setProjects(projects.map(project => 
-        project.id === projectId ? updatedProject : project
-      ));
+      // El proyecto se actualizará automáticamente via realtime
+      // Solo refrescamos si hay algún problema con la conexión
+      if (!isConnected) {
+        await refreshProjects();
+      }
     } catch (err) {
       alert('Error al actualizar el estado del proyecto');
     }
@@ -141,10 +130,10 @@ function ProjectsContent() {
         throw new Error('Error al actualizar la fase');
       }
 
-      const updatedProject = await response.json();
-      setProjects(projects.map(project => 
-        project.id === projectId ? updatedProject : project
-      ));
+      // El proyecto se actualizará automáticamente via realtime
+      if (!isConnected) {
+        await refreshProjects();
+      }
     } catch (err) {
       alert('Error al actualizar la fase del proyecto');
     }
@@ -161,7 +150,10 @@ function ProjectsContent() {
         throw new Error('Error al eliminar el proyecto');
       }
 
-      setProjects(projects.filter(project => project.id !== projectId));
+      // El proyecto se eliminará automáticamente via realtime
+      if (!isConnected) {
+        await refreshProjects();
+      }
     } catch (err) {
       alert('Error al eliminar el proyecto');
     }
@@ -193,8 +185,8 @@ function ProjectsContent() {
           <h2 className="text-lg font-semibold text-red-400 mb-2">Error</h2>
           <p className="text-red-300">{error}</p>
           <button
-            onClick={fetchProjects}
-            className="mt-4 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:neon-glow-subtle"
+            onClick={refreshProjects}
+            className="mt-4 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-lg"
           >
             Reintentar
           </button>
@@ -206,7 +198,9 @@ function ProjectsContent() {
   const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== '');
 
   return (
-    <div className="space-y-6">
+    <>
+      <RealtimeStatus isConnected={isConnected} error={error} />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -217,9 +211,11 @@ function ProjectsContent() {
         </div>
         
         <div className="flex items-center gap-3">
+          <RealtimeStatusIcon isConnected={isConnected} error={error} />
+          
           <button
             onClick={() => setShowMetrics(!showMetrics)}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2"
+            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -229,7 +225,7 @@ function ProjectsContent() {
           
           <Link
             href="/projects/new"
-            className="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 neon-glow hover:neon-pulse flex items-center gap-2"
+            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -371,6 +367,7 @@ function ProjectsContent() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
