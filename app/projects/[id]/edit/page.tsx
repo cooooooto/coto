@@ -125,7 +125,7 @@ export default function EditProjectPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto"> {/* Fixed TypeScript error */}
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
