@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ProjectForm from '@/components/ProjectForm';
 import { Project, CreateProjectData } from '@/types/project';
+import { generateId } from '@/lib/projects';
 
 export default function EditProjectPage() {
   const params = useParams();
@@ -63,7 +64,7 @@ export default function EditProjectPage() {
           phase: data.phase,
           tasks: data.tasks.map(task => ({
             ...task,
-            id: Math.random().toString(36).substring(2) + Date.now().toString(36),
+            id: generateId(),
             createdAt: new Date()
           }))
         }),
