@@ -50,13 +50,16 @@ export class SupabaseService {
     }
 
     // Group tasks by project_id
-    const tasksByProject = (tasks || []).reduce((acc: Record<string, Task[]>, task: Database['public']['Tables']['tasks']['Row']) => {
-      if (!acc[task.project_id]) {
-        acc[task.project_id] = [];
+    const tasksByProject: Record<string, Task[]> = {};
+    if (tasks) {
+      for (const task of tasks) {
+        const taskRow = task as any;
+        if (!tasksByProject[taskRow.project_id]) {
+          tasksByProject[taskRow.project_id] = [];
+        }
+        tasksByProject[taskRow.project_id].push(dbRowToTask(taskRow));
       }
-      acc[task.project_id].push(dbRowToTask(task));
-      return acc;
-    }, {} as Record<string, Task[]>);
+    }
 
     return (projects || []).map((project: Database['public']['Tables']['projects']['Row']) => 
       dbRowToProject(project, tasksByProject[project.id] || [])
