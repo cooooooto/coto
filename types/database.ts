@@ -10,6 +10,7 @@ export interface Database {
           status: 'To-Do' | 'In-Progress' | 'Done';
           phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress: number;
+          owner_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export interface Database {
           status: 'To-Do' | 'In-Progress' | 'Done';
           phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress?: number;
+          owner_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -32,6 +34,7 @@ export interface Database {
           status?: 'To-Do' | 'In-Progress' | 'Done';
           phase?: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress?: number;
+          owner_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

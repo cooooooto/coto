@@ -60,6 +60,7 @@ function dbRowToProject(row: Database['public']['Tables']['projects']['Row'], ta
     status: row.status,
     phase: row.phase,
     progress: row.progress,
+    owner_id: row.owner_id || 'unknown-owner',
     tasks,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at)
