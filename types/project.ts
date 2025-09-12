@@ -4,11 +4,47 @@ export type ProjectStatus = 'To-Do' | 'In-Progress' | 'Done';
 
 export type ProjectPhase = 'DEV' | 'INT' | 'PRE' | 'PROD';
 
+export type UserRole = 'admin' | 'member' | 'viewer';
+
+export type ProjectMemberRole = 'owner' | 'admin' | 'member' | 'viewer';
+
+export interface Profile {
+  id: string;
+  email: string;
+  full_name?: string;
+  avatar_url?: string;
+  role: UserRole;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface Task {
   id: string;
   name: string;
   completed: boolean;
+  assigned_to?: string; // Profile ID
+  assignee?: Profile; // Populated from join
   createdAt: Date;
+}
+
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  user_id: string;
+  role: ProjectMemberRole;
+  joined_at: Date;
+  profile?: Profile; // Populated from join
+}
+
+export interface Comment {
+  id: string;
+  project_id: string;
+  task_id?: string;
+  user_id: string;
+  content: string;
+  created_at: Date;
+  updated_at: Date;
+  user?: Profile; // Populated from join
 }
 
 export interface Project {
@@ -20,6 +56,10 @@ export interface Project {
   status: ProjectStatus;
   phase: ProjectPhase;
   progress: number; // Calculado: % de tareas completadas + avance de fase
+  owner_id: string;
+  owner?: Profile; // Populated from join
+  members?: ProjectMember[]; // Populated from join
+  comments?: Comment[]; // Populated from join
   createdAt: Date;
   updatedAt: Date;
 }

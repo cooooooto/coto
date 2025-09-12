@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Project, ProjectFilters } from '@/types/project';
 import { sortProjectsByPriority } from '@/lib/projects';
 import ProjectCard from '@/components/ProjectCard';
+import DashboardMetrics from '@/components/DashboardMetrics';
 import Link from 'next/link';
 
 function ProjectsContent() {
@@ -14,6 +15,7 @@ function ProjectsContent() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showMetrics, setShowMetrics] = useState(true);
   
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -214,16 +216,35 @@ function ProjectsContent() {
           </p>
         </div>
         
-        <Link
-          href="/projects/new"
-          className="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 neon-glow hover:neon-pulse flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Nuevo Proyecto
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowMetrics(!showMetrics)}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            {showMetrics ? 'Ocultar' : 'Mostrar'} Métricas
+          </button>
+          
+          <Link
+            href="/projects/new"
+            className="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 neon-glow hover:neon-pulse flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo Proyecto
+          </Link>
+        </div>
       </div>
+
+      {/* Dashboard Metrics */}
+      {showMetrics && (
+        <div className="animate-fade-in-up">
+          <DashboardMetrics projects={projects} />
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle">
