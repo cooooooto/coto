@@ -1,6 +1,7 @@
 // API Routes para operaciones específicas de proyecto
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getDemoProject, updateDemoProject, isDemoMode } from '@/lib/demo-data';
 import { SupabaseService } from '@/lib/supabase-service';
 import { validateProjectData } from '@/lib/projects';
 import { UpdateProjectData, CreateProjectData } from '@/types/project';
@@ -12,6 +13,21 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    
+    if (isDemoMode()) {
+      console.log(`[API] Demo mode - GET project ${id}`);
+      const project = getDemoProject(id);
+      
+      if (!project) {
+        return NextResponse.json(
+          { error: 'Project not found' },
+          { status: 404 }
+        );
+      }
+      
+      return NextResponse.json(project);
+    }
+    
     const project = await SupabaseService.getProject(id);
 
     if (!project) {
@@ -38,6 +54,21 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+    
+    if (isDemoMode()) {
+      console.log(`[API] Demo mode - PATCH project ${id}`);
+      const body = await request.json();
+      
+      const updatedProject = updateDemoProject(id, body);
+      if (!updatedProject) {
+        return NextResponse.json(
+          { error: 'Project not found' },
+          { status: 404 }
+        );
+      }
+      
+      return NextResponse.json(updatedProject);
+    }
     const body = await request.json() as UpdateProjectData;
 
     // Check if it's a simple status or phase update
@@ -113,6 +144,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    
+    if (isDemoMode()) {
+      console.log(`[API] Demo mode - DELETE project ${id}`);
+      return NextResponse.json({ success: true });
+    }
     
     // Check if project exists
     const existingProject = await SupabaseService.getProject(id);

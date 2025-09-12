@@ -5,15 +5,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Project } from '@/types/project';
+import { Project, ProjectPhase } from '@/types/project';
 import { formatDeadline, isProjectOverdue, calculateProjectProgress } from '@/lib/projects';
 import ProgressBar from '@/components/ProgressBar';
 import { StatusBadge, PhaseBadge } from '@/components/StatusBadge';
+import PhaseTransitionSemaphore from '@/components/PhaseTransitionSemaphore';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const projectId = params.id as string;
+  const { currentUser, loading: userLoading } = useCurrentUser();
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -154,7 +157,65 @@ export default function ProjectDetailPage() {
     }
   };
 
-  if (loading) {
+  // Solicitar transición de fase
+  const handleRequestTransition = async (toPhase: ProjectPhase, comment?: string) => {
+    if (!currentUser || !project) return;
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/transitions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toPhase,
+          comment,
+          requestedBy: currentUser.id
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al solicitar transición');
+      }
+
+      // Refrescar proyecto para mostrar la nueva transición
+      await fetchProject();
+    } catch (err) {
+      console.error('Error requesting transition:', err);
+      alert(err instanceof Error ? err.message : 'Error al solicitar transición');
+      throw err;
+    }
+  };
+
+  // Revisar transición de fase
+  const handleReviewTransition = async (transitionId: string, approved: boolean, comment?: string) => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch(`/api/transitions/${transitionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          approved,
+          reviewedBy: currentUser.id,
+          comment
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al revisar transición');
+      }
+
+      // Refrescar proyecto para mostrar los cambios
+      await fetchProject();
+    } catch (err) {
+      console.error('Error reviewing transition:', err);
+      alert(err instanceof Error ? err.message : 'Error al revisar transición');
+      throw err;
+    }
+  };
+
+  if (loading || userLoading) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="animate-pulse space-y-6">
@@ -257,7 +318,20 @@ export default function ProjectDetailPage() {
           </div>
           <ProgressBar progress={project.progress} size="lg" />
         </div>
+      </div>
 
+      {/* Phase Transition Semaphore */}
+      {currentUser && (
+        <PhaseTransitionSemaphore
+          project={project}
+          currentUser={currentUser}
+          onRequestTransition={handleRequestTransition}
+          onReviewTransition={handleReviewTransition}
+        />
+      )}
+
+      {/* Project Details */}
+      <div className="bg-gray-900 rounded-lg border border-gray-700 neon-glow-subtle p-6">
         {/* Quick Actions */}
         <div className="flex items-center gap-3 pt-4 border-t border-gray-700">
           <span className="text-sm font-medium text-gray-300">Acciones rápidas:</span>

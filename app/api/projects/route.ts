@@ -1,6 +1,7 @@
 // API Routes para CRUD de proyectos
 
 import { NextRequest, NextResponse } from 'next/server';
+import { demoProjects, isDemoMode } from '@/lib/demo-data';
 import { 
   SupabaseService, 
   SupabaseConfigError, 
@@ -27,6 +28,14 @@ export async function GET() {
     console.log('[API] GET /api/projects - Starting request');
     const startTime = Date.now();
     
+    if (isDemoMode()) {
+      console.log('[API] ✅ Running in DEMO mode - returning offline data');
+      const duration = Date.now() - startTime;
+      console.log(`[API] GET /api/projects - Demo success in ${duration}ms, returned ${demoProjects.length} projects`);
+      return NextResponse.json(demoProjects);
+    }
+    
+    console.log('[API] Running in PRODUCTION mode - connecting to Supabase');
     const projects = await SupabaseService.getProjects();
     
     const duration = Date.now() - startTime;

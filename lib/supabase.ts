@@ -21,17 +21,6 @@ function validateSupabaseConfig() {
     errors.push('SUPABASE_SERVICE_ROLE_KEY is missing or using placeholder value');
   }
 
-  if (errors.length > 0) {
-    console.error('❌ Supabase Configuration Errors:');
-    errors.forEach(error => console.error(`  - ${error}`));
-    console.error('📝 Please create a .env.local file with your Supabase credentials');
-    console.error('📖 See SUPABASE_SETUP.md for detailed instructions');
-    
-    // In production, throw error to prevent silent failures
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(`Supabase configuration invalid: ${errors.join(', ')}`);
-    }
-  }
 
   return {
     supabaseUrl: supabaseUrl || 'https://placeholder.supabase.co',

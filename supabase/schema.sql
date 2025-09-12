@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS projects (
   status VARCHAR(20) CHECK (status IN ('To-Do', 'In-Progress', 'Done')) NOT NULL DEFAULT 'To-Do',
   phase VARCHAR(10) CHECK (phase IN ('DEV', 'INT', 'PRE', 'PROD')) NOT NULL DEFAULT 'DEV',
   progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  requires_approval BOOLEAN DEFAULT TRUE,
+  current_transition_id UUID,
   owner_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -54,11 +56,31 @@ CREATE TABLE IF NOT EXISTS comments (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Create phase transitions table for approval workflow
+CREATE TABLE IF NOT EXISTS phase_transitions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  from_phase VARCHAR(10) CHECK (from_phase IN ('DEV', 'INT', 'PRE', 'PROD')),
+  to_phase VARCHAR(10) CHECK (to_phase IN ('DEV', 'INT', 'PRE', 'PROD')) NOT NULL,
+  status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',
+  requested_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  approved_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  comment TEXT,
+  requested_at TIMESTAMPTZ DEFAULT NOW(),
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Add foreign key constraint for current_transition_id
+ALTER TABLE projects ADD CONSTRAINT fk_projects_current_transition 
+  FOREIGN KEY (current_transition_id) REFERENCES phase_transitions(id) ON DELETE SET NULL;
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_projects_phase ON projects(phase);
 CREATE INDEX IF NOT EXISTS idx_projects_deadline ON projects(deadline);
 CREATE INDEX IF NOT EXISTS idx_projects_owner ON projects(owner_id);
+CREATE INDEX IF NOT EXISTS idx_projects_current_transition ON projects(current_transition_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed);
 CREATE INDEX IF NOT EXISTS idx_tasks_assigned ON tasks(assigned_to);
@@ -67,6 +89,10 @@ CREATE INDEX IF NOT EXISTS idx_project_members_user ON project_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_project ON comments(project_id);
 CREATE INDEX IF NOT EXISTS idx_comments_task ON comments(task_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user ON comments(user_id);
+CREATE INDEX IF NOT EXISTS idx_phase_transitions_project_status ON phase_transitions(project_id, status);
+CREATE INDEX IF NOT EXISTS idx_phase_transitions_pending ON phase_transitions(status) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_phase_transitions_requested_by ON phase_transitions(requested_by);
+CREATE INDEX IF NOT EXISTS idx_phase_transitions_approved_by ON phase_transitions(approved_by);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -240,6 +266,52 @@ CREATE POLICY "Users can update own comments" ON comments
 
 CREATE POLICY "Users can delete own comments" ON comments 
   FOR DELETE USING (auth.uid() = user_id);
+
+-- Phase transitions policies
+ALTER TABLE phase_transitions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view transitions in accessible projects" ON phase_transitions 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE id = phase_transitions.project_id AND (
+        owner_id = auth.uid() OR 
+        EXISTS (
+          SELECT 1 FROM project_members 
+          WHERE project_id = projects.id AND user_id = auth.uid()
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Project members can create transitions" ON phase_transitions 
+  FOR INSERT WITH CHECK (
+    auth.uid() = requested_by AND
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE id = phase_transitions.project_id AND (
+        owner_id = auth.uid() OR 
+        EXISTS (
+          SELECT 1 FROM project_members 
+          WHERE project_id = projects.id AND user_id = auth.uid() AND role IN ('admin', 'member')
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Project owners and admins can review transitions" ON phase_transitions 
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE id = phase_transitions.project_id AND (
+        owner_id = auth.uid() OR 
+        EXISTS (
+          SELECT 1 FROM project_members 
+          WHERE project_id = projects.id AND user_id = auth.uid() AND role = 'admin'
+        )
+      )
+    )
+  );
 
 -- Function to automatically create profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user() 

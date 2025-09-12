@@ -2,6 +2,23 @@
 
 Un **tracker de proyectos full-stack** intuitivo y moderno construido con **Next.js 15**, **TypeScript** y **Tailwind CSS**. Diseñado específicamente para desarrolladores que necesitan gestionar múltiples proyectos de desarrollo con fases, tareas y deadlines.
 
+## 🚀 Inicio Rápido (Modo Demo)
+
+```bash
+npm install
+npm run dev
+```
+
+La aplicación funciona en **modo demo** por defecto con:
+- ✅ **Proyecto de ejemplo** pre-cargado
+- ✅ **Sistema de semáforos** completamente funcional  
+- ✅ **Todas las características** visibles y usables
+- ✅ **Cero configuración** requerida
+
+Para habilitar persistencia de datos, configura Supabase siguiendo la [guía de configuración](#configuración-de-supabase). 
+
+📖 **Más información**: [DEMO_MODE.md](./DEMO_MODE.md)
+
 ![Dev Project Tracker](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -39,6 +56,20 @@ Un **tracker de proyectos full-stack** intuitivo y moderno construido con **Next
 - Almacenamiento JSON (migrable a BD)
 - Componentes modulares
 - Hooks personalizados
+
+## Configuración de Supabase
+
+Para habilitar la persistencia de datos y el sistema de semáforos de transiciones:
+
+1. **Crear proyecto en Supabase**: https://supabase.com/dashboard
+2. **Configurar variables de entorno**:
+   ```bash
+   cp env.example .env.local
+   # Edita .env.local con tus credenciales de Supabase
+   ```
+3. **Ejecutar migraciones**:
+   - Ve a Supabase → SQL Editor
+   - Ejecuta el script `scripts/migrate-phase-transitions.sql`
 
 ## Instalación y Configuración
 

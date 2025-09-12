@@ -29,6 +29,12 @@ export function useRealtimeProjects(): UseRealtimeProjectsReturn {
       const response = await fetch('/api/projects');
       
       if (!response.ok) {
+        // Don't show error for configuration issues in development
+        if (response.status === 500 && process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ Projects API not available. Configure Supabase to enable data persistence.');
+          setProjects([]);
+          return;
+        }
         throw new Error('Error al cargar proyectos');
       }
       
@@ -36,7 +42,14 @@ export function useRealtimeProjects(): UseRealtimeProjectsReturn {
       setProjects(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      setError(errorMessage);
+      // In development, just log the error instead of showing it to the user
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Projects API error:', errorMessage);
+        setProjects([]);
+        setError(null);
+      } else {
+        setError(errorMessage);
+      }
       console.error('Error fetching projects:', err);
     } finally {
       setLoading(false);

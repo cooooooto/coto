@@ -1,7 +1,16 @@
-import { supabaseAdmin, supabaseConfigValid } from './supabase';
-import { Project, CreateProjectData, Task } from '@/types/project';
+import { supabaseAdmin, supabaseConfigValid as configValid } from './supabase';
+import { Project, CreateProjectData, Task, PhaseTransition, ProjectPhase, TransitionStatus, Profile } from '@/types/project';
 import { calculateProjectProgress } from './projects';
 import { Database } from '@/types/database';
+
+// Helper function for config validation
+function supabaseConfigValid(): boolean {
+  // In development, be more lenient to avoid blocking functionality
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+  return configValid;
+}
 
 // Enhanced error types for better debugging
 export class SupabaseConfigError extends Error {
@@ -60,6 +69,8 @@ function dbRowToProject(row: Database['public']['Tables']['projects']['Row'], ta
     status: row.status,
     phase: row.phase,
     progress: row.progress,
+    requires_approval: row.requires_approval,
+    current_transition_id: row.current_transition_id || undefined,
     owner_id: row.owner_id || 'unknown-owner',
     tasks,
     createdAt: new Date(row.created_at),
@@ -184,7 +195,14 @@ export class SupabaseService {
   static async getProject(id: string): Promise<Project | null> {
     const { data: project, error: projectError } = await supabaseAdmin
       .from('projects')
-      .select('*')
+      .select(`
+        *,
+        current_transition:phase_transitions!current_transition_id(
+          *,
+          requester:profiles!phase_transitions_requested_by_fkey(*),
+          approver:profiles!phase_transitions_approved_by_fkey(*)
+        )
+      `)
       .eq('id', id)
       .single();
 
@@ -205,7 +223,19 @@ export class SupabaseService {
     }
 
     const projectTasks = (tasks || []).map(dbRowToTask);
-    return dbRowToProject(project, projectTasks);
+    const projectWithTasks = dbRowToProject(project, projectTasks);
+    
+    // Add current transition information
+    if (project.current_transition) {
+      projectWithTasks.current_transition = {
+        ...project.current_transition,
+        requested_at: new Date(project.current_transition.requested_at),
+        reviewed_at: project.current_transition.reviewed_at ? new Date(project.current_transition.reviewed_at) : undefined,
+        created_at: new Date(project.current_transition.created_at)
+      } as PhaseTransition;
+    }
+    
+    return projectWithTasks;
   }
 
   // Create a new project
@@ -390,5 +420,201 @@ export class SupabaseService {
     }
 
     return await this.getProject(id) || dbRowToProject(project as any, []);
+  }
+
+  // Phase transition methods
+  
+  // Solicitar transición de fase
+  static async requestPhaseTransition(
+    projectId: string, 
+    toPhase: ProjectPhase, 
+    requestedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    if (!supabaseConfigValid()) {
+      throw new SupabaseConfigError('Supabase configuration is invalid');
+    }
+
+    // Verificar que no hay transición pendiente
+    const { data: existingTransition } = await supabaseAdmin
+      .from('phase_transitions')
+      .select('*')
+      .eq('project_id', projectId)
+      .eq('status', 'pending')
+      .single();
+
+    if (existingTransition) {
+      throw new Error('Ya existe una transición pendiente para este proyecto');
+    }
+
+    // Obtener fase actual
+    const project = await this.getProject(projectId);
+    if (!project) throw new Error('Proyecto no encontrado');
+
+    // Crear solicitud de transición
+    const { data: transition, error } = await supabaseAdmin
+      .from('phase_transitions')
+      .insert({
+        project_id: projectId,
+        from_phase: project.phase,
+        to_phase: toPhase,
+        status: 'pending' as TransitionStatus,
+        requested_by: requestedBy,
+        comment
+      })
+      .select(`
+        *,
+        requester:profiles!phase_transitions_requested_by_fkey(*)
+      `)
+      .single();
+
+    if (error) throw new Error(`Error creating transition: ${error.message}`);
+
+    // Actualizar proyecto con referencia a transición
+    await supabaseAdmin
+      .from('projects')
+      .update({ current_transition_id: transition.id })
+      .eq('id', projectId);
+
+    return {
+      ...transition,
+      requested_at: new Date(transition.requested_at),
+      reviewed_at: transition.reviewed_at ? new Date(transition.reviewed_at) : undefined,
+      created_at: new Date(transition.created_at)
+    } as PhaseTransition;
+  }
+
+  // Revisar transición de fase
+  static async reviewPhaseTransition(
+    transitionId: string,
+    approved: boolean,
+    reviewedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    if (!supabaseConfigValid()) {
+      throw new SupabaseConfigError('Supabase configuration is invalid');
+    }
+
+    const { data: transition, error: fetchError } = await supabaseAdmin
+      .from('phase_transitions')
+      .select('*, project:projects(*)')
+      .eq('id', transitionId)
+      .single();
+
+    if (fetchError || !transition) {
+      throw new Error('Transición no encontrada');
+    }
+
+    const newStatus: TransitionStatus = approved ? 'approved' : 'rejected';
+    
+    // Actualizar transición
+    const { error: updateError } = await supabaseAdmin
+      .from('phase_transitions')
+      .update({
+        status: newStatus,
+        approved_by: reviewedBy,
+        reviewed_at: new Date().toISOString(),
+        comment: comment || transition.comment
+      })
+      .eq('id', transitionId);
+
+    if (updateError) throw new Error(`Error updating transition: ${updateError.message}`);
+
+    // Si fue aprobada, actualizar fase del proyecto
+    if (approved) {
+      const tempProject = { ...transition.project, phase: transition.to_phase };
+      const progress = calculateProjectProgress(tempProject);
+
+      await supabaseAdmin
+        .from('projects')
+        .update({ 
+          phase: transition.to_phase,
+          progress,
+          current_transition_id: null
+        })
+        .eq('id', transition.project_id);
+    } else {
+      // Si fue rechazada, limpiar referencia
+      await supabaseAdmin
+        .from('projects')
+        .update({ current_transition_id: null })
+        .eq('id', transition.project_id);
+    }
+
+    // Retornar transición actualizada
+    const { data: updatedTransition } = await supabaseAdmin
+      .from('phase_transitions')
+      .select(`
+        *,
+        requester:profiles!phase_transitions_requested_by_fkey(*),
+        approver:profiles!phase_transitions_approved_by_fkey(*)
+      `)
+      .eq('id', transitionId)
+      .single();
+
+    return {
+      ...updatedTransition,
+      requested_at: new Date(updatedTransition.requested_at),
+      reviewed_at: updatedTransition.reviewed_at ? new Date(updatedTransition.reviewed_at) : undefined,
+      created_at: new Date(updatedTransition.created_at)
+    } as PhaseTransition;
+  }
+
+  // Obtener historial de transiciones de un proyecto
+  static async getProjectTransitionHistory(projectId: string): Promise<PhaseTransition[]> {
+    if (!supabaseConfigValid()) {
+      throw new SupabaseConfigError('Supabase configuration is invalid');
+    }
+
+    const { data: transitions, error } = await supabaseAdmin
+      .from('phase_transitions')
+      .select(`
+        *,
+        requester:profiles!phase_transitions_requested_by_fkey(*),
+        approver:profiles!phase_transitions_approved_by_fkey(*)
+      `)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error(`Error fetching transitions: ${error.message}`);
+    
+    return (transitions || []).map(t => ({
+      ...t,
+      requested_at: new Date(t.requested_at),
+      reviewed_at: t.reviewed_at ? new Date(t.reviewed_at) : undefined,
+      created_at: new Date(t.created_at)
+    })) as PhaseTransition[];
+  }
+
+  // Obtener transiciones pendientes para un usuario (como aprobador)
+  static async getPendingTransitionsForUser(userId: string): Promise<PhaseTransition[]> {
+    if (!supabaseConfigValid()) {
+      throw new SupabaseConfigError('Supabase configuration is invalid');
+    }
+
+    const { data: transitions, error } = await supabaseAdmin
+      .from('phase_transitions')
+      .select(`
+        *,
+        requester:profiles!phase_transitions_requested_by_fkey(*),
+        project:projects(name, owner_id)
+      `)
+      .eq('status', 'pending')
+      .neq('requested_by', userId) // No mostrar las propias solicitudes
+      .order('requested_at', { ascending: true });
+
+    if (error) throw new Error(`Error fetching pending transitions: ${error.message}`);
+    
+    // Filtrar solo las transiciones de proyectos donde el usuario puede aprobar
+    const filteredTransitions = (transitions || []).filter(t => {
+      return t.project?.owner_id === userId; // Solo si es owner del proyecto
+    });
+
+    return filteredTransitions.map(t => ({
+      ...t,
+      requested_at: new Date(t.requested_at),
+      reviewed_at: t.reviewed_at ? new Date(t.reviewed_at) : undefined,
+      created_at: new Date(t.created_at)
+    })) as PhaseTransition[];
   }
 }

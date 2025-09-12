@@ -56,10 +56,14 @@ export interface Project {
   status: ProjectStatus;
   phase: ProjectPhase;
   progress: number; // Calculado: % de tareas completadas + avance de fase
+  requires_approval: boolean;
+  current_transition_id?: string;
   owner_id: string;
   owner?: Profile; // Populated from join
   members?: ProjectMember[]; // Populated from join
   comments?: Comment[]; // Populated from join
+  current_transition?: PhaseTransition; // Populated from join
+  pending_transitions?: PhaseTransition[]; // Populated from join
   createdAt: Date;
   updatedAt: Date;
 }
@@ -109,4 +113,29 @@ export const PHASE_COLORS = {
   'INT': 'bg-yellow-900 text-yellow-400 border-yellow-600',
   'PRE': 'bg-orange-900 text-orange-400 border-orange-600',
   'PROD': 'bg-green-900 text-green-400 border-green-600 neon-glow-subtle'
+} as const;
+
+// Types for phase transitions
+export type TransitionStatus = 'pending' | 'approved' | 'rejected';
+
+export interface PhaseTransition {
+  id: string;
+  project_id: string;
+  from_phase: ProjectPhase | null;
+  to_phase: ProjectPhase;
+  status: TransitionStatus;
+  requested_by: string;
+  approved_by?: string;
+  comment?: string;
+  requested_at: Date;
+  reviewed_at?: Date;
+  requester?: Profile; // Populated from join
+  approver?: Profile; // Populated from join
+  created_at: Date;
+}
+
+export const TRANSITION_COLORS = {
+  'pending': 'bg-yellow-900 text-yellow-400 border-yellow-600 animate-pulse',
+  'approved': 'bg-green-900 text-green-400 border-green-600',
+  'rejected': 'bg-red-900 text-red-400 border-red-600'
 } as const;

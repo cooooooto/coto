@@ -10,6 +10,8 @@ export interface Database {
           status: 'To-Do' | 'In-Progress' | 'Done';
           phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress: number;
+          requires_approval: boolean;
+          current_transition_id: string | null;
           owner_id: string | null;
           created_at: string;
           updated_at: string;
@@ -22,6 +24,8 @@ export interface Database {
           status: 'To-Do' | 'In-Progress' | 'Done';
           phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress?: number;
+          requires_approval?: boolean;
+          current_transition_id?: string | null;
           owner_id?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -34,6 +38,8 @@ export interface Database {
           status?: 'To-Do' | 'In-Progress' | 'Done';
           phase?: 'DEV' | 'INT' | 'PRE' | 'PROD';
           progress?: number;
+          requires_approval?: boolean;
+          current_transition_id?: string | null;
           owner_id?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -45,6 +51,7 @@ export interface Database {
           project_id: string;
           name: string;
           completed: boolean;
+          assigned_to: string | null;
           created_at: string;
         };
         Insert: {
@@ -52,6 +59,7 @@ export interface Database {
           project_id: string;
           name: string;
           completed?: boolean;
+          assigned_to?: string | null;
           created_at?: string;
         };
         Update: {
@@ -59,6 +67,129 @@ export interface Database {
           project_id?: string;
           name?: string;
           completed?: boolean;
+          assigned_to?: string | null;
+          created_at?: string;
+        };
+      };
+      profiles: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          avatar_url: string | null;
+          role: 'admin' | 'member' | 'viewer';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          role?: 'admin' | 'member' | 'viewer';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          role?: 'admin' | 'member' | 'viewer';
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      project_members: {
+        Row: {
+          id: string;
+          project_id: string;
+          user_id: string;
+          role: 'owner' | 'admin' | 'member' | 'viewer';
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          user_id: string;
+          role?: 'owner' | 'admin' | 'member' | 'viewer';
+          joined_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          user_id?: string;
+          role?: 'owner' | 'admin' | 'member' | 'viewer';
+          joined_at?: string;
+        };
+      };
+      comments: {
+        Row: {
+          id: string;
+          project_id: string;
+          task_id: string | null;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          task_id?: string | null;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          task_id?: string | null;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      phase_transitions: {
+        Row: {
+          id: string;
+          project_id: string;
+          from_phase: 'DEV' | 'INT' | 'PRE' | 'PROD' | null;
+          to_phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
+          status: 'pending' | 'approved' | 'rejected';
+          requested_by: string | null;
+          approved_by: string | null;
+          comment: string | null;
+          requested_at: string;
+          reviewed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          from_phase?: 'DEV' | 'INT' | 'PRE' | 'PROD' | null;
+          to_phase: 'DEV' | 'INT' | 'PRE' | 'PROD';
+          status?: 'pending' | 'approved' | 'rejected';
+          requested_by?: string | null;
+          approved_by?: string | null;
+          comment?: string | null;
+          requested_at?: string;
+          reviewed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          from_phase?: 'DEV' | 'INT' | 'PRE' | 'PROD' | null;
+          to_phase?: 'DEV' | 'INT' | 'PRE' | 'PROD';
+          status?: 'pending' | 'approved' | 'rejected';
+          requested_by?: string | null;
+          approved_by?: string | null;
+          comment?: string | null;
+          requested_at?: string;
+          reviewed_at?: string | null;
           created_at?: string;
         };
       };
