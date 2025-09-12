@@ -1,4 +1,4 @@
-// Dashboard principal de proyectos integrado en la home page
+// Dashboard principal de proyectos con filtros y gestión
 
 'use client';
 
@@ -9,7 +9,7 @@ import { sortProjectsByPriority } from '@/lib/projects';
 import ProjectCard from '@/components/ProjectCard';
 import Link from 'next/link';
 
-export default function Home() {
+export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,14 +94,14 @@ export default function Home() {
     });
 
     // Actualizar URL sin recargar la página
-    const newUrl = params.toString() ? `/?${params.toString()}` : '/';
+    const newUrl = params.toString() ? `/projects?${params.toString()}` : '/projects';
     router.replace(newUrl);
   };
 
   // Limpiar filtros
   const clearFilters = () => {
     setFilters({});
-    router.replace('/');
+    router.replace('/projects');
   };
 
   // Manejar actualización de estado
@@ -169,7 +169,7 @@ export default function Home() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white neon-text">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Mis Proyectos</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
@@ -208,11 +208,21 @@ export default function Home() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white neon-text">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-white neon-text">Mis Proyectos</h1>
           <p className="text-gray-300 mt-1">
             {filteredProjects.length} de {projects.length} proyectos
           </p>
         </div>
+        
+        <Link
+          href="/projects/new"
+          className="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 neon-glow hover:neon-pulse flex items-center gap-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo Proyecto
+        </Link>
       </div>
 
       {/* Filtros */}
@@ -279,7 +289,7 @@ export default function Home() {
                 onChange={(e) => updateFilters({ overdue: e.target.checked || undefined })}
                 className="rounded border-gray-600 text-green-500 focus:ring-green-500 bg-gray-800"
               />
-              <span className="text-sm font-medium text-gray-300">Solo vencidos</span>
+              <span className="text-sm font-medium text-gray-700">Solo vencidos</span>
             </label>
           </div>
         </div>
