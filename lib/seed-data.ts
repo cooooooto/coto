@@ -293,10 +293,10 @@ export async function seedSampleData() {
     
     fs.writeFileSync(projectsFile, JSON.stringify(projectsWithProgress, null, 2));
     
-    console.log('✅ Datos de ejemplo creados exitosamente');
+    console.log('Datos de ejemplo creados exitosamente');
     return projectsWithProgress;
   } catch (error) {
-    console.error('❌ Error creando datos de ejemplo:', error);
+    console.error('Error creando datos de ejemplo:', error);
     throw error;
   }
 }

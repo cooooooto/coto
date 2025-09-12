@@ -1,4 +1,4 @@
-# 🚀 Dev Project Tracker
+# Dev Project Tracker
 
 Un **tracker de proyectos full-stack** intuitivo y moderno construido con **Next.js 15**, **TypeScript** y **Tailwind CSS**. Diseñado específicamente para desarrolladores que necesitan gestionar múltiples proyectos de desarrollo con fases, tareas y deadlines.
 
@@ -6,41 +6,41 @@ Un **tracker de proyectos full-stack** intuitivo y moderno construido con **Next
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-## ✨ Características Principales
+## Características Principales
 
-### 🎯 **Gestión Completa de Proyectos**
+### **Gestión Completa de Proyectos**
 - **Estados**: To-Do → In-Progress → Done
 - **Fases de Desarrollo**: DEV → INT → PRE → PROD
 - **Progreso Automático**: Calculado en base a tareas completadas + fase actual
 - **Deadlines Inteligentes**: Alertas visuales para proyectos vencidos
 
-### 📋 **Sistema de Tareas Avanzado**
+### **Sistema de Tareas Avanzado**
 - Tareas dinámicas con checkboxes interactivos
 - Progreso en tiempo real
 - Estado persistente entre sesiones
 - Interfaz drag-and-drop ready (extensible)
 
-### 🎨 **UI/UX Moderna**
+### **UI/UX Moderna**
 - Diseño responsive mobile-first
 - Componentes modulares reutilizables
 - Animaciones suaves con Tailwind
 - Badges de color para estados y fases
 - Barras de progreso animadas
 
-### 🔍 **Filtrado y Búsqueda**
+### **Filtrado y Búsqueda**
 - Filtros por estado, fase y fecha
 - Búsqueda en tiempo real
 - Proyectos vencidos destacados
 - Ordenamiento por prioridad automático
 
-### 🏗️ **Arquitectura Escalable**
+### **Arquitectura Escalable**
 - API Routes con Next.js App Router
 - Tipado fuerte con TypeScript
 - Almacenamiento JSON (migrable a BD)
 - Componentes modulares
 - Hooks personalizados
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Prerrequisitos
 - **Node.js** 18+ 
@@ -68,7 +68,7 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 2. Haz clic en **"Crear Proyectos de Ejemplo"**
 3. Explora el dashboard en `/projects`
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 dev-tracker/
@@ -102,7 +102,7 @@ dev-tracker/
     └── projects.json          # Base de datos JSON
 ```
 
-## 🎮 Guía de Uso
+## Guía de Uso
 
 ### **Flujo Básico de Trabajo**
 
@@ -134,7 +134,7 @@ dev-tracker/
 - **App Móvil**: React Native + Expo + Backend API
 - **Dashboard Analytics**: React + D3.js + WebSockets
 
-## 🔧 Personalización y Extensión
+## Personalización y Extensión
 
 ### **Migrar a Base de Datos Real**
 
@@ -189,7 +189,7 @@ vercel --prod
 # DATABASE_URL, NEXTAUTH_SECRET, etc.
 ```
 
-## 🎯 Casos de Uso Específicos
+## Casos de Uso Específicos
 
 ### **Para Freelancers**
 - Trackear múltiples proyectos de clientes
@@ -206,7 +206,7 @@ vercel --prod
 - Práctica con tecnologías reales
 - Portfolio de desarrollo
 
-## 🛠️ Comandos Útiles
+## Comandos Útiles
 
 ```bash
 # Desarrollo
@@ -226,7 +226,7 @@ rm data/projects.json
 # Ir a localhost:3000 → "Crear Proyectos de Ejemplo"
 ```
 
-## 🤝 Contribución y Mejoras Futuras
+## Contribución y Mejoras Futuras
 
 ### **Próximas Funcionalidades**
 - [ ] Autenticación con NextAuth
@@ -246,11 +246,11 @@ rm data/projects.json
 - **React Hook Form** para formularios complejos
 - **Zustand** para state management global
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está bajo la licencia **MIT**. Úsalo libremente para proyectos personales o comerciales.
 
-## 🙋‍♂️ Soporte
+## Soporte
 
 ¿Problemas o sugerencias? 
 
@@ -261,4 +261,4 @@ Este proyecto está bajo la licencia **MIT**. Úsalo libremente para proyectos p
 
 ---
 
-**¡Feliz coding! 🚀** Construido con ❤️ para la comunidad de desarrolladores full-stack.
+**¡Feliz coding!** Construido con amor para la comunidad de desarrolladores full-stack.

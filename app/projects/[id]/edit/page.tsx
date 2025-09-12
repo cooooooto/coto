@@ -179,7 +179,7 @@ export default function EditProjectPage() {
       {/* Info Section */}
       <div className="mt-8 bg-gray-800 rounded-lg p-6 border border-gray-700">
         <h3 className="text-lg font-semibold text-yellow-400 mb-3 neon-text">
-          ⚠️ Información importante
+          Información importante
         </h3>
         <div className="space-y-2 text-sm text-gray-300">
           <p><strong>Tareas:</strong> Al editar tareas, las marcadas como completadas mantendrán su estado.</p>

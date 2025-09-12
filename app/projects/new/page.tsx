@@ -94,7 +94,7 @@ export default function NewProjectPage() {
       {/* Help Section */}
       <div className="mt-8 bg-gray-800 rounded-lg p-6 border border-gray-700">
         <h3 className="text-lg font-semibold text-green-400 mb-3 neon-text">
-          💡 Consejos para tu proyecto
+          Consejos para tu proyecto
         </h3>
         <div className="space-y-2 text-sm text-gray-300">
           <p><strong>Tareas:</strong> Divide tu proyecto en tareas específicas y alcanzables.</p>
