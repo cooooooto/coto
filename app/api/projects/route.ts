@@ -1,22 +1,15 @@
 // API Routes para CRUD de proyectos
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllProjects, createProject } from '@/lib/storage';
-import { generateId, validateProjectData, calculateProjectProgress } from '@/lib/projects';
-import { Project, CreateProjectData } from '@/types/project';
+import { SupabaseService } from '@/lib/supabase-service';
+import { validateProjectData } from '@/lib/projects';
+import { CreateProjectData } from '@/types/project';
 
 // GET /api/projects - Obtener todos los proyectos
 export async function GET() {
   try {
-    const projects = await getAllProjects();
-    
-    // Recalcular progreso para cada proyecto
-    const projectsWithProgress = projects.map(project => ({
-      ...project,
-      progress: calculateProjectProgress(project)
-    }));
-
-    return NextResponse.json(projectsWithProgress);
+    const projects = await SupabaseService.getProjects();
+    return NextResponse.json(projects);
   } catch (error) {
     console.error('Error fetching projects:', error);
     return NextResponse.json(
@@ -40,34 +33,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear tareas con IDs y fechas
-    const tasks = body.tasks.map(task => ({
-      ...task,
-      id: generateId(),
-      createdAt: new Date()
-    }));
+    // Crear proyecto usando Supabase
+    const project = await SupabaseService.createProject(body);
 
-    // Crear proyecto
-    const project: Project = {
-      id: generateId(),
-      name: body.name.trim(),
-      description: body.description?.trim(),
-      tasks,
-      deadline: new Date(body.deadline),
-      status: body.status,
-      phase: body.phase,
-      progress: 0, // Se calculará después
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    // Calcular progreso inicial
-    project.progress = calculateProjectProgress(project);
-
-    // Guardar proyecto
-    const savedProject = await createProject(project);
-
-    return NextResponse.json(savedProject, { status: 201 });
+    return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error('Error creating project:', error);
     return NextResponse.json(
