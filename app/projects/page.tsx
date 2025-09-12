@@ -2,14 +2,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Project, ProjectFilters } from '@/types/project';
 import { sortProjectsByPriority } from '@/lib/projects';
 import ProjectCard from '@/components/ProjectCard';
 import Link from 'next/link';
 
-export default function ProjectsPage() {
+function ProjectsContent() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -350,5 +350,28 @@ export default function ProjectsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-white neon-text">Proyectos</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-gray-900 rounded-lg border border-gray-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
+              <div className="h-3 bg-gray-700 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    }>
+      <ProjectsContent />
+    </Suspense>
   );
 }
