@@ -8,6 +8,7 @@ import { generateId } from '@/lib/projects';
 
 interface ProjectFormProps {
   project?: Project; // Para edición
+  initialData?: CreateProjectData | null; // Para templates
   onSubmit: (data: CreateProjectData) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
@@ -19,13 +20,17 @@ interface TaskInput {
   completed: boolean;
 }
 
-export default function ProjectForm({ project, onSubmit, onCancel, isSubmitting = false }: ProjectFormProps) {
+export default function ProjectForm({ project, initialData, onSubmit, onCancel, isSubmitting = false }: ProjectFormProps) {
   const [formData, setFormData] = useState({
-    name: project?.name || '',
-    description: project?.description || '',
-    deadline: project?.deadline ? new Date(project.deadline).toISOString().split('T')[0] : '',
-    status: project?.status || 'To-Do' as ProjectStatus,
-    phase: project?.phase || 'DEV' as ProjectPhase
+    name: project?.name || initialData?.name || '',
+    description: project?.description || initialData?.description || '',
+    deadline: project?.deadline 
+      ? new Date(project.deadline).toISOString().split('T')[0] 
+      : initialData?.deadline 
+        ? new Date(initialData.deadline).toISOString().split('T')[0]
+        : '',
+    status: project?.status || initialData?.status || 'To-Do' as ProjectStatus,
+    phase: project?.phase || initialData?.phase || 'DEV' as ProjectPhase
   });
 
   const [tasks, setTasks] = useState<TaskInput[]>(
@@ -33,7 +38,13 @@ export default function ProjectForm({ project, onSubmit, onCancel, isSubmitting 
       id: task.id,
       name: task.name,
       completed: task.completed
-    })) || [{ id: generateId(), name: '', completed: false }]
+    })) || 
+    initialData?.tasks.map(task => ({
+      id: generateId(),
+      name: task.name,
+      completed: task.completed
+    })) || 
+    [{ id: generateId(), name: '', completed: false }]
   );
 
   const [errors, setErrors] = useState<string[]>([]);
