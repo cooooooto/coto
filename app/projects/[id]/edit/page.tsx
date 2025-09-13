@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ProjectForm from '@/components/ProjectForm';
@@ -20,11 +20,11 @@ export default function EditProjectPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Cargar proyecto
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Proyecto no encontrado');
@@ -39,11 +39,11 @@ export default function EditProjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
     fetchProject();
-  }, [projectId]);
+  }, [fetchProject]);
 
   // Manejar envío del formulario
   const handleSubmit = async (data: CreateProjectData) => {
@@ -185,7 +185,7 @@ export default function EditProjectPage() {
         <div className="space-y-2 text-sm text-gray-300">
           <p><strong>Tareas:</strong> Al editar tareas, las marcadas como completadas mantendrán su estado.</p>
           <p><strong>Progreso:</strong> Se recalculará automáticamente basado en las tareas y fase actual.</p>
-          <p><strong>Historial:</strong> Los cambios actualizarán la fecha de "última modificación".</p>
+          <p><strong>Historial:</strong> Los cambios actualizarán la fecha de &ldquo;última modificación&rdquo;.</p>
         </div>
       </div>
     </div>

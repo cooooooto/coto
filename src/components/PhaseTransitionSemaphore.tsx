@@ -167,7 +167,7 @@ export default function PhaseTransitionSemaphore({
 
           {project.current_transition.comment && (
             <div className="bg-gray-100 dark:bg-gray-700 rounded p-2 mb-2">
-              <p className="text-sm text-gray-600 dark:text-gray-300 italic">"{project.current_transition.comment}"</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 italic">&ldquo;{project.current_transition.comment}&rdquo;</p>
             </div>
           )}
 
@@ -301,7 +301,7 @@ export default function PhaseTransitionSemaphore({
               {project.current_transition.comment && (
                 <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-700 rounded">
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    <strong>Comentario:</strong> "{project.current_transition.comment}"
+                    <strong>Comentario:</strong> &ldquo;{project.current_transition.comment}&rdquo;
                   </p>
                 </div>
               )}
