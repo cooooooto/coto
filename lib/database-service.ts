@@ -32,32 +32,8 @@ export class DatabaseOperationError extends Error {
 type DatabaseProvider = 'supabase' | 'neon';
 
 function getDatabaseProvider(): DatabaseProvider {
-  // Verificar si hay variables de Neon configuradas
-  const hasNeonConfig = !!(process.env.NEON_DATABASE_URL || process.env.DATABASE_URL);
-  const hasSupabaseConfig = !!(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  
-  console.log('🔍 Detección de proveedor:', {
-    hasNeonConfig,
-    hasSupabaseConfig,
-    NEON_DATABASE_URL: !!process.env.NEON_DATABASE_URL,
-    DATABASE_URL: !!process.env.DATABASE_URL,
-    NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL
-  });
-  
-  // Priorizar Neon si está configurado
-  if (hasNeonConfig) {
-    console.log('✅ Usando Neon como proveedor de BD');
-    return 'neon';
-  }
-  
-  // Fallback a Supabase solo si está configurado
-  if (hasSupabaseConfig) {
-    console.log('✅ Usando Supabase como proveedor de BD');
-    return 'supabase';
-  }
-  
-  // Si no hay configuración, usar Neon por defecto
-  console.log('⚠️  No hay configuración específica, usando Neon por defecto');
+  // Siempre usar Neon
+  console.log('🔍 Proveedor de BD: Neon');
   return 'neon';
 }
 
@@ -300,6 +276,117 @@ class NeonDatabaseService {
       throw new DatabaseOperationError(`Error deleting project: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  static async requestPhaseTransition(
+    projectId: string,
+    toPhase: ProjectPhase,
+    requestedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    try {
+      // Verificar que no hay transición pendiente
+      const existingTransitions = await executeQuery(`
+        SELECT * FROM phase_transitions
+        WHERE project_id = $1 AND status = 'pending'
+      `, [projectId]);
+
+      if (existingTransitions.length > 0) {
+        throw new DatabaseOperationError('Ya existe una transición pendiente para este proyecto');
+      }
+
+      // Obtener fase actual del proyecto
+      const projects = await executeQuery(`
+        SELECT phase FROM projects WHERE id = $1
+      `, [projectId]);
+
+      if (projects.length === 0) {
+        throw new DatabaseOperationError('Proyecto no encontrado');
+      }
+
+      const fromPhase = projects[0].phase;
+
+      // Crear nueva transición
+      const transitions = await executeQuery(`
+        INSERT INTO phase_transitions (project_id, from_phase, to_phase, status, requested_by, comment)
+        VALUES ($1, $2, $3, 'pending', $4, $5)
+        RETURNING *
+      `, [projectId, fromPhase, toPhase, requestedBy, comment]);
+
+      return transitions[0];
+    } catch (error) {
+      throw new DatabaseOperationError(`Error requesting phase transition: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  static async getProjectTransitionHistory(projectId: string): Promise<PhaseTransition[]> {
+    try {
+      const transitions = await executeQuery(`
+        SELECT * FROM phase_transitions
+        WHERE project_id = $1
+        ORDER BY created_at DESC
+      `, [projectId]);
+
+      return transitions;
+    } catch (error) {
+      throw new DatabaseOperationError(`Error getting transition history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  static async reviewPhaseTransition(
+    transitionId: string,
+    approved: boolean,
+    reviewedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    try {
+      const status = approved ? 'approved' : 'rejected';
+
+      const transitions = await executeQuery(`
+        UPDATE phase_transitions
+        SET status = $1, approved_by = $2, reviewed_at = NOW(), comment = $3
+        WHERE id = $4
+        RETURNING *
+      `, [status, reviewedBy, comment, transitionId]);
+
+      if (transitions.length === 0) {
+        throw new DatabaseOperationError('Transición no encontrada');
+      }
+
+      // Si fue aprobada, actualizar la fase del proyecto
+      if (approved) {
+        const transition = transitions[0];
+        await executeQuery(`
+          UPDATE projects
+          SET phase = $1, updated_at = NOW()
+          WHERE id = $2
+        `, [transition.to_phase, transition.project_id]);
+      }
+
+      return transitions[0];
+    } catch (error) {
+      throw new DatabaseOperationError(`Error reviewing phase transition: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  static async getPendingTransitionsForUser(userId: string): Promise<PhaseTransition[]> {
+    try {
+      const transitions = await executeQuery(`
+        SELECT pt.*, p.name as project_name
+        FROM phase_transitions pt
+        JOIN projects p ON pt.project_id = p.id
+        WHERE pt.status = 'pending'
+        AND (p.owner_id = $1 OR EXISTS (
+          SELECT 1 FROM project_members pm
+          WHERE pm.project_id = p.id AND pm.user_id = $1
+        ))
+        ORDER BY pt.created_at DESC
+      `, [userId]);
+
+      return transitions;
+    } catch (error) {
+      throw new DatabaseOperationError(`Error getting pending transitions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }
 
 // Servicio principal que usa el proveedor configurado
@@ -309,98 +396,71 @@ export class DatabaseService {
   }
 
   static async getProjects(): Promise<Project[]> {
-    const provider = this.getProvider();
-    console.log(`📊 Usando proveedor de BD: ${provider}`);
-    
-    switch (provider) {
-      case 'neon':
-        return NeonDatabaseService.getProjects();
-      case 'supabase':
-        // Importar dinámicamente para evitar errores de configuración
-        const { SupabaseService } = await import('./supabase-service');
-        return SupabaseService.getProjects();
-      default:
-        throw new DatabaseConfigError(`Proveedor de base de datos no soportado: ${provider}`);
-    }
+    console.log('📊 Usando Neon como proveedor de BD');
+    return NeonDatabaseService.getProjects();
   }
 
   static async getProject(id: string): Promise<Project | null> {
-    const provider = this.getProvider();
-    
-    switch (provider) {
-      case 'neon':
-        return NeonDatabaseService.getProject(id);
-      case 'supabase':
-        const { SupabaseService } = await import('./supabase-service');
-        return SupabaseService.getProject(id);
-      default:
-        throw new DatabaseConfigError(`Proveedor de base de datos no soportado: ${provider}`);
-    }
+    return NeonDatabaseService.getProject(id);
   }
 
   static async createProject(data: CreateProjectData): Promise<Project> {
-    const provider = this.getProvider();
-    
-    switch (provider) {
-      case 'neon':
-        return NeonDatabaseService.createProject(data);
-      case 'supabase':
-        const { SupabaseService } = await import('./supabase-service');
-        return SupabaseService.createProject(data);
-      default:
-        throw new DatabaseConfigError(`Proveedor de base de datos no soportado: ${provider}`);
-    }
+    return NeonDatabaseService.createProject(data);
   }
 
   static async updateProject(id: string, updates: Partial<CreateProjectData>): Promise<Project> {
-    const provider = this.getProvider();
-    
-    switch (provider) {
-      case 'neon':
-        return NeonDatabaseService.updateProject(id, updates);
-      case 'supabase':
-        const { SupabaseService } = await import('./supabase-service');
-        return SupabaseService.updateProject(id, updates);
-      default:
-        throw new DatabaseConfigError(`Proveedor de base de datos no soportado: ${provider}`);
-    }
+    return NeonDatabaseService.updateProject(id, updates);
   }
 
   static async deleteProject(id: string): Promise<void> {
-    const provider = this.getProvider();
-    
-    switch (provider) {
-      case 'neon':
-        return NeonDatabaseService.deleteProject(id);
-      case 'supabase':
-        const { SupabaseService } = await import('./supabase-service');
-        return SupabaseService.deleteProject(id);
-      default:
-        throw new DatabaseConfigError(`Proveedor de base de datos no soportado: ${provider}`);
-    }
+    return NeonDatabaseService.deleteProject(id);
+  }
+
+  static async requestPhaseTransition(
+    projectId: string,
+    toPhase: ProjectPhase,
+    requestedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    // Solo usar Neon
+    return NeonDatabaseService.requestPhaseTransition(projectId, toPhase, requestedBy, comment);
+  }
+
+  static async getProjectTransitionHistory(projectId: string): Promise<PhaseTransition[]> {
+    // Solo usar Neon
+    return NeonDatabaseService.getProjectTransitionHistory(projectId);
+  }
+
+  static async reviewPhaseTransition(
+    transitionId: string,
+    approved: boolean,
+    reviewedBy: string,
+    comment?: string
+  ): Promise<PhaseTransition> {
+    // Solo usar Neon
+    return NeonDatabaseService.reviewPhaseTransition(transitionId, approved, reviewedBy, comment);
+  }
+
+  static async getPendingTransitionsForUser(userId: string): Promise<PhaseTransition[]> {
+    // Solo usar Neon
+    return NeonDatabaseService.getPendingTransitionsForUser(userId);
   }
 
   // Métodos de utilidad
   static getProviderInfo() {
-    const provider = this.getProvider();
-    
-    if (provider === 'neon') {
-      const { getNeonEnvironmentInfo } = require('./neon-config');
-      return {
-        provider: 'neon',
-        ...getNeonEnvironmentInfo()
-      };
-    } else {
-      const { getEnvironmentInfo } = require('./supabase-config');
-      return {
-        provider: 'supabase',
-        ...getEnvironmentInfo()
-      };
-    }
+    const { getNeonEnvironmentInfo } = require('./neon-config');
+    return {
+      provider: 'neon',
+      ...getNeonEnvironmentInfo()
+    };
   }
 
-  // Método para forzar un proveedor específico (útil para testing)
+  // Método para forzar un proveedor específico (solo Neon soportado)
   static forceProvider(provider: DatabaseProvider) {
+    if (provider !== 'neon') {
+      console.warn('⚠️ Solo Neon está soportado. Ignorando cambio de proveedor.');
+      return;
+    }
     process.env.FORCE_DATABASE_PROVIDER = provider;
   }
 }

@@ -4,6 +4,32 @@ import GoogleProvider from 'next-auth/providers/google';
 import { executeQuery } from './neon-config';
 import bcrypt from 'bcryptjs';
 
+// Extender tipos de NextAuth
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name?: string | null;
+      image?: string | null;
+      role?: string;
+    };
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    role?: string;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    role?: string;
+  }
+}
+
 // Tipos para el usuario
 interface User {
   id: string;
@@ -103,7 +129,7 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       // Enviar propiedades al cliente
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
       }
@@ -120,7 +146,6 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: '/auth/signin',
-    signUp: '/auth/signup',
     error: '/auth/error'
   },
 

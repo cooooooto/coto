@@ -95,11 +95,9 @@ export const demoProjects: Project[] = [
 ];
 
 export const isDemoMode = (): boolean => {
-  // Verificar si hay configuración de base de datos (Neon o Supabase)
-  const hasDatabaseConfig = !!(process.env.NEON_DATABASE_URL || 
-                              process.env.DATABASE_URL || 
-                              process.env.NEXT_PUBLIC_SUPABASE_URL);
-  
+  // Verificar si hay configuración de base de datos Neon
+  const hasDatabaseConfig = !!(process.env.NEON_DATABASE_URL || process.env.DATABASE_URL);
+
   // Solo usar demo si no hay configuración de BD
   return !hasDatabaseConfig;
 };

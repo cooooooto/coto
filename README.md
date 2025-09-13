@@ -15,8 +15,7 @@ La aplicación funciona en **modo demo** por defecto con:
 - ✅ **Todas las características** visibles y usables
 - ✅ **Cero configuración** requerida
 
-Para habilitar persistencia de datos, tienes dos opciones:
-- **Supabase**: Sigue la [guía de configuración](#configuración-de-supabase)
+Para habilitar persistencia de datos:
 - **Neon** (recomendado): Usa la [guía de migración](./NEON_MIGRATION_GUIDE.md) 
 
 📖 **Más información**: [DEMO_MODE.md](./DEMO_MODE.md)
@@ -58,20 +57,6 @@ Para habilitar persistencia de datos, tienes dos opciones:
 - Almacenamiento JSON (migrable a BD)
 - Componentes modulares
 - Hooks personalizados
-
-## Configuración de Supabase
-
-Para habilitar la persistencia de datos y el sistema de semáforos de transiciones:
-
-1. **Crear proyecto en Supabase**: https://supabase.com/dashboard
-2. **Configurar variables de entorno**:
-   ```bash
-   cp env.example .env.local
-   # Edita .env.local con tus credenciales de Supabase
-   ```
-3. **Ejecutar migraciones**:
-   - Ve a Supabase → SQL Editor
-   - Ejecuta el script `scripts/migrate-phase-transitions.sql`
 
 ## Instalación y Configuración
 
@@ -254,9 +239,6 @@ npm run lint
 
 # Migración a Neon (recomendado)
 npm run migrate-to-neon
-
-# Backup de Supabase
-npm run backup-supabase
 
 # Configurar Neon manualmente
 npm run setup-neon
