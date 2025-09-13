@@ -37,24 +37,24 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, subtitle, icon, trend, className = '' }: MetricCardProps) {
   return (
-    <div className={`bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle hover:neon-glow transition-all duration-300 ${className}`}>
+    <div className={`bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 p-6 neon-glow-subtle hover:neon-glow transition-all duration-300 ${className}`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-300">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
           )}
           {trend && (
             <div className={`flex items-center gap-1 mt-2 text-xs ${
-              trend.isPositive ? 'text-green-400' : 'text-red-400'
+              trend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
             }`}>
               <TrendingUp className={`w-3 h-3 ${!trend.isPositive ? 'rotate-180' : ''}`} />
               <span>{Math.abs(trend.value)}%</span>
             </div>
           )}
         </div>
-        <div className="p-3 bg-gray-800 rounded-lg">
+        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
           {icon}
         </div>
       </div>
@@ -135,10 +135,10 @@ export default function DashboardMetrics({ projects }: DashboardMetricsProps) {
 
   if (projects.length === 0) {
     return (
-      <div className="bg-gray-900 rounded-lg border border-gray-700 p-8 text-center neon-glow-subtle">
-        <BarChart3 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">Sin métricas disponibles</h3>
-        <p className="text-gray-300">Crea tu primer proyecto para ver las métricas del dashboard.</p>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 p-8 text-center neon-glow-subtle">
+        <BarChart3 className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Sin métricas disponibles</h3>
+        <p className="text-gray-600 dark:text-gray-300">Crea tu primer proyecto para ver las métricas del dashboard.</p>
       </div>
     );
   }
@@ -197,8 +197,8 @@ export default function DashboardMetrics({ projects }: DashboardMetricsProps) {
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribución por Estado */}
-        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle">
-          <h3 className="text-lg font-semibold text-white mb-4">Distribución por Estado</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 p-6 neon-glow-subtle">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribución por Estado</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -215,13 +215,25 @@ export default function DashboardMetrics({ projects }: DashboardMetricsProps) {
                     <Cell key={`status-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    color: '#fff'
-                  }} 
+                    color: '#111827'
+                  }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-sm">
+                          <p className="text-gray-900 dark:text-white font-medium">{data.name}</p>
+                          <p className="text-gray-600 dark:text-gray-300">Proyectos: {data.value}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -229,36 +241,41 @@ export default function DashboardMetrics({ projects }: DashboardMetricsProps) {
           <div className="flex flex-wrap gap-4 mt-4">
             {metrics.statusDistribution.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
-                <div 
-                  className="w-3 h-3 rounded-full" 
+                <div
+                  className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-sm text-gray-300">{item.name}: {item.value}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}: {item.value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Distribución por Fase */}
-        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle">
-          <h3 className="text-lg font-semibold text-white mb-4">Distribución por Fase</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 p-6 neon-glow-subtle">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribución por Fase</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={metrics.phaseDistribution}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#9ca3af"
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+                <XAxis
+                  dataKey="name"
+                  stroke="#6b7280"
                   fontSize={12}
                 />
-                <YAxis stroke="#9ca3af" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px',
-                    color: '#fff'
-                  }} 
+                <YAxis stroke="#6b7280" fontSize={12} />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-sm">
+                          <p className="text-gray-900 dark:text-white font-medium">{label}</p>
+                          <p className="text-gray-600 dark:text-gray-300">Proyectos: {payload[0].value}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
                 <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -268,38 +285,47 @@ export default function DashboardMetrics({ projects }: DashboardMetricsProps) {
       </div>
 
       {/* Tendencia de Proyectos */}
-      <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle">
-        <h3 className="text-lg font-semibold text-white mb-4">Tendencia de Proyectos (Últimos 6 meses)</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-700 p-6 neon-glow-subtle">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tendencia de Proyectos (Últimos 6 meses)</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={metrics.projectsByMonth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="month" 
-                stroke="#9ca3af"
+              <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+              <XAxis
+                dataKey="month"
+                stroke="#6b7280"
                 fontSize={12}
               />
-              <YAxis stroke="#9ca3af" fontSize={12} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#fff'
-                }} 
+              <YAxis stroke="#6b7280" fontSize={12} />
+              <Tooltip
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-sm">
+                        <p className="text-gray-900 dark:text-white font-medium mb-1">{label}</p>
+                        {payload.map((entry, index) => (
+                          <p key={index} style={{ color: entry.color }} className="text-gray-600 dark:text-gray-300">
+                            {entry.name}: {entry.value}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="projects" 
-                stroke="#10b981" 
+              <Line
+                type="monotone"
+                dataKey="projects"
+                stroke="#10b981"
                 strokeWidth={2}
                 dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
                 name="Total Proyectos"
               />
-              <Line 
-                type="monotone" 
-                dataKey="completed" 
-                stroke="#84cc16" 
+              <Line
+                type="monotone"
+                dataKey="completed"
+                stroke="#84cc16"
                 strokeWidth={2}
                 dot={{ fill: '#84cc16', strokeWidth: 2, r: 4 }}
                 name="Completados"

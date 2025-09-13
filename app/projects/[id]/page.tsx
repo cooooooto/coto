@@ -219,11 +219,11 @@ export default function ProjectDetailPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-700 rounded w-1/3"></div>
-          <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-            <div className="h-6 bg-gray-700 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
           </div>
         </div>
       </div>
@@ -266,12 +266,12 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-gray-900 rounded-lg border border-gray-700 neon-glow-subtle p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 neon-glow-subtle p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white mb-2 neon-text">{project.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 neon-text">{project.name}</h1>
             {project.description && (
-              <p className="text-gray-300 text-lg">{project.description}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-lg">{project.description}</p>
             )}
           </div>
           

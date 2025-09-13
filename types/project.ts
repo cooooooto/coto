@@ -103,16 +103,16 @@ export const PHASE_PROGRESS = {
 } as const;
 
 export const STATUS_COLORS = {
-  'To-Do': 'bg-gray-800 text-gray-300 border-gray-700',
-  'In-Progress': 'bg-green-900 text-green-400 border-green-600 neon-glow-subtle',
-  'Done': 'bg-lime-900 text-lime-400 border-lime-500 neon-glow-subtle'
+  'To-Do': 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700',
+  'In-Progress': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 border-green-300 dark:border-green-600 neon-glow-subtle',
+  'Done': 'bg-lime-100 dark:bg-lime-900 text-lime-700 dark:text-lime-400 border-lime-300 dark:border-lime-500 neon-glow-subtle'
 } as const;
 
 export const PHASE_COLORS = {
-  'DEV': 'bg-purple-900 text-purple-400 border-purple-600',
-  'INT': 'bg-yellow-900 text-yellow-400 border-yellow-600',
-  'PRE': 'bg-orange-900 text-orange-400 border-orange-600',
-  'PROD': 'bg-green-900 text-green-400 border-green-600 neon-glow-subtle'
+  'DEV': 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-600',
+  'INT': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600',
+  'PRE': 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-600',
+  'PROD': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 border-green-300 dark:border-green-600 neon-glow-subtle'
 } as const;
 
 // Types for phase transitions
@@ -135,7 +135,7 @@ export interface PhaseTransition {
 }
 
 export const TRANSITION_COLORS = {
-  'pending': 'bg-yellow-900 text-yellow-400 border-yellow-600 animate-pulse',
-  'approved': 'bg-green-900 text-green-400 border-green-600',
-  'rejected': 'bg-red-900 text-red-400 border-red-600'
+  'pending': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600 animate-pulse',
+  'approved': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 border-green-300 dark:border-green-600',
+  'rejected': 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400 border-red-300 dark:border-red-600'
 } as const;
