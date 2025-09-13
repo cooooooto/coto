@@ -111,6 +111,26 @@ export default function RealtimeNotifications({ className = '' }: RealtimeNotifi
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Componente de notificaciones para móvil
+  const MobileNotifications = () => {
+    if (unreadCount === 0) return null;
+
+    return (
+      <div className="md:hidden fixed top-4 right-4 z-50">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-red-500 hover:bg-red-400 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg animate-pulse"
+          aria-label="Ver notificaciones"
+        >
+          <Bell className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 bg-white text-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        </button>
+      </div>
+    );
+  };
+
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'task_completed':
@@ -139,9 +159,13 @@ export default function RealtimeNotifications({ className = '' }: RealtimeNotifi
   };
 
   return (
-    <div className={`relative ${className}`}>
-      {/* Bell Icon with Badge */}
-      <button
+    <>
+      {/* Mobile Notifications */}
+      <MobileNotifications />
+
+      <div className={`relative ${className}`}>
+        {/* Bell Icon with Badge */}
+        <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
         aria-label="Notificaciones"
@@ -253,6 +277,7 @@ export default function RealtimeNotifications({ className = '' }: RealtimeNotifi
           </div>
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -306,7 +306,7 @@ function HomeContent() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
@@ -435,8 +435,22 @@ function HomeContent() {
       </div>
 
       {/* Panel de filtros desplegable */}
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilters ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilters ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-4">
+          {/* Métricas en móvil */}
+          <div className="md:hidden mb-4">
+            <h4 className="text-sm font-medium text-gray-300 mb-3">Resumen de Proyectos</h4>
+            <DashboardMetrics
+              projects={projects}
+              onMetricClick={handleMetricClick}
+              activeFilters={{
+                status: filters.status,
+                overdue: filters.overdue
+              }}
+              showInFilters={true}
+            />
+            <div className="border-t border-gray-700 my-4"></div>
+          </div>
           <div className="flex flex-wrap gap-3">
             <input
               type="text"
@@ -522,7 +536,7 @@ function HomeContent() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {filteredProjects.map(project => (
             <ProjectCard
               key={project.id}
@@ -549,7 +563,7 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>

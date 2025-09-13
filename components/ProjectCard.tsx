@@ -67,18 +67,18 @@ export default function ProjectCard({
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 sm:p-6 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 neon-glow-subtle hover:neon-glow">
+    <div className="bg-gray-900 rounded-lg border border-gray-700 p-3 sm:p-4 md:p-6 hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 neon-glow-subtle hover:neon-glow">
       {/* Header */}
-      <div className="flex items-start justify-between mb-3 sm:mb-4">
+      <div className="flex items-start justify-between mb-2 sm:mb-3 md:mb-4">
         <div className="flex-1 min-w-0">
           <Link
             href={`/projects/${project.id}`}
-            className="text-base sm:text-lg font-semibold text-white hover:text-green-400 transition-colors hover:neon-text block truncate"
+            className="text-sm sm:text-base md:text-lg font-semibold text-white hover:text-green-400 transition-colors hover:neon-text block truncate"
           >
             {project.name}
           </Link>
           {project.description && (
-            <p className="text-sm text-gray-300 mt-1 line-clamp-2">
+            <p className="text-xs sm:text-sm text-gray-300 mt-1 line-clamp-2">
               {project.description}
             </p>
           )}
@@ -88,7 +88,7 @@ export default function ProjectCard({
         <div className="flex gap-1 ml-2 flex-shrink-0">
           <Link
             href={`/projects/${project.id}/edit`}
-            className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1 rounded transition-all duration-300 border border-gray-600 hover:border-green-500"
+            className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded transition-all duration-300 border border-gray-600 hover:border-green-500"
             title="Editar proyecto"
           >
             ✏️
@@ -101,7 +101,7 @@ export default function ProjectCard({
                   handleDelete();
                 }
               }}
-              className="text-xs bg-red-900 hover:bg-red-800 text-red-400 px-2 py-1 rounded transition-all duration-300 border border-red-600 hover:neon-glow-subtle"
+              className="text-xs bg-red-900 hover:bg-red-800 text-red-400 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded transition-all duration-300 border border-red-600 hover:neon-glow-subtle"
               title="Eliminar proyecto"
             >
               🗑️
@@ -111,7 +111,7 @@ export default function ProjectCard({
       </div>
 
       {/* Badges */}
-      <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 md:mb-4">
         <StatusBadge status={project.status} />
         <PhaseBadge phase={project.phase} />
         {isOverdue && (
@@ -169,21 +169,21 @@ export default function ProjectCard({
       </div> */}
 
       {/* Progress */}
-      <div className="mb-4">
-        <ProgressBar progress={project.progress} size="md" />
+      <div className="mb-2 sm:mb-3 md:mb-4">
+        <ProgressBar progress={project.progress} size="sm" />
       </div>
 
       {/* Actions */}
-      <div className="pt-3 sm:pt-4 border-t border-gray-800">
+      <div className="pt-2 sm:pt-3 md:pt-4 border-t border-gray-800">
         {/* Mobile: Stack buttons vertically on very small screens */}
-        <div className="flex flex-col xs:flex-row xs:flex-wrap gap-2">
+        <div className="flex flex-col xs:flex-row xs:flex-wrap gap-1.5 sm:gap-2">
           {/* Next Status Button */}
           {getNextStatus(project.status) && (
             <button
               onClick={() => handleStatusChange(getNextStatus(project.status)!)}
               disabled={isUpdating}
               className={`
-                text-xs px-3 py-2 rounded-full transition-all duration-300 border flex-shrink-0 touch-manipulation flex items-center gap-2
+                text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-full transition-all duration-300 border flex-shrink-0 touch-manipulation flex items-center gap-1.5 sm:gap-2
                 ${isUpdating
                   ? 'bg-yellow-900 text-yellow-400 border-yellow-600 cursor-not-allowed'
                   : 'bg-green-900 hover:bg-green-800 text-green-400 border-green-600 hover:neon-glow-subtle'
@@ -210,7 +210,7 @@ export default function ProjectCard({
               onClick={() => handlePhaseChange(getNextPhase(project.phase)!)}
               disabled={isUpdating}
               className={`
-                text-xs px-3 py-2 rounded-full transition-all duration-300 border flex-shrink-0 touch-manipulation flex items-center gap-2
+                text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-full transition-all duration-300 border flex-shrink-0 touch-manipulation flex items-center gap-1.5 sm:gap-2
                 ${isUpdating
                   ? 'bg-yellow-900 text-yellow-400 border-yellow-600 cursor-not-allowed'
                   : 'bg-purple-900 hover:bg-purple-800 text-purple-400 border-purple-600 hover:neon-glow-subtle'
