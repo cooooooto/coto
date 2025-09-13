@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#32ff32">
+  <defs>
+    <style>
+      .cls-1{fill:#32ff32;}
+      .cls-2{fill:#000;}
+    </style>
+  </defs>
+  <rect class="cls-2" width="512" height="512" rx="64"/>
+  <g>
+    <circle class="cls-1" cx="256" cy="180" r="45"/>
+    <rect class="cls-1" x="211" y="245" width="90" height="45" rx="22.5"/>
+    <rect class="cls-1" x="241" y="305" width="30" height="30" rx="15"/>
+    <circle class="cls-1" cx="256" cy="355" r="15"/>
+    <rect class="cls-1" x="226" y="385" width="60" height="8" rx="4"/>
+  </g>
+</svg>
