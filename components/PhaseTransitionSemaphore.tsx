@@ -88,12 +88,12 @@ export default function PhaseTransitionSemaphore({
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-white">Control de Fases</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Control de Fases</h3>
         {project.requires_approval && (
-          <span className="text-xs bg-blue-900 text-blue-400 px-2 py-1 rounded border border-blue-600">
+          <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-1 rounded border border-blue-300 dark:border-blue-600">
             Aprobación Requerida
           </span>
         )}
@@ -103,11 +103,11 @@ export default function PhaseTransitionSemaphore({
       <div className="flex items-center gap-4 mb-4">
         <div className="flex flex-col items-center">
           <div className={`w-8 h-8 rounded-full ${getSemaphoreColor()} ${hasPendingTransition ? 'animate-pulse' : ''} shadow-lg`}></div>
-          <span className="text-xs text-gray-400 mt-1">
+          <span className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {hasPendingTransition ? 'Pendiente' : 'Activo'}
           </span>
         </div>
-        
+
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <span className={`px-3 py-1 rounded text-sm font-medium ${PHASE_COLORS[project.phase]}`}>
@@ -115,14 +115,14 @@ export default function PhaseTransitionSemaphore({
             </span>
             {nextPhase && (
               <>
-                <span className="text-gray-500 text-lg">→</span>
+                <span className="text-gray-500 dark:text-gray-400 text-lg">→</span>
                 <span className={`px-3 py-1 rounded text-sm font-medium border-dashed border-2 ${PHASE_COLORS[nextPhase]} opacity-60`}>
                   {getPhaseLabel(nextPhase)}
                 </span>
               </>
             )}
           </div>
-          
+
           {hasPendingTransition && (
             <div className={`text-xs px-2 py-1 rounded ${TRANSITION_COLORS.pending}`}>
               🕐 Transición pendiente de aprobación
@@ -133,26 +133,26 @@ export default function PhaseTransitionSemaphore({
 
       {/* Información de Transición Actual */}
       {project.current_transition && (
-        <div className="bg-gray-800 rounded-lg p-3 mb-4 border border-gray-600">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-4 border border-gray-200 dark:border-gray-600">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
               Solicitud: {project.current_transition.from_phase ? getPhaseLabel(project.current_transition.from_phase) : 'Inicial'} → {getPhaseLabel(project.current_transition.to_phase)}
             </span>
             <span className={`text-xs px-2 py-1 rounded font-medium ${TRANSITION_COLORS[project.current_transition.status]}`}>
-              {project.current_transition.status === 'pending' ? 'Pendiente' : 
+              {project.current_transition.status === 'pending' ? 'Pendiente' :
                project.current_transition.status === 'approved' ? 'Aprobada' : 'Rechazada'}
             </span>
           </div>
-          
+
           {project.current_transition.comment && (
-            <div className="bg-gray-700 rounded p-2 mb-2">
-              <p className="text-sm text-gray-300 italic">"{project.current_transition.comment}"</p>
+            <div className="bg-gray-100 dark:bg-gray-700 rounded p-2 mb-2">
+              <p className="text-sm text-gray-600 dark:text-gray-300 italic">"{project.current_transition.comment}"</p>
             </div>
           )}
-          
-          <div className="text-xs text-gray-400 flex justify-between">
+
+          <div className="text-xs text-gray-500 dark:text-gray-400 flex justify-between">
             <span>
-              Solicitado por: <strong className="text-gray-300">{project.current_transition.requester?.full_name || 'Usuario'}</strong>
+              Solicitado por: <strong className="text-gray-700 dark:text-gray-300">{project.current_transition.requester?.full_name || 'Usuario'}</strong>
             </span>
             <span>
               {new Date(project.current_transition.requested_at).toLocaleDateString('es-ES', {
@@ -166,9 +166,9 @@ export default function PhaseTransitionSemaphore({
           </div>
 
           {project.current_transition.approved_by && project.current_transition.reviewed_at && (
-            <div className="text-xs text-gray-400 mt-1 pt-1 border-t border-gray-600">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 pt-1 border-t border-gray-200 dark:border-gray-600">
               <span>
-                {project.current_transition.status === 'approved' ? 'Aprobado' : 'Rechazado'} por: <strong className="text-gray-300">{project.current_transition.approver?.full_name || 'Usuario'}</strong>
+                {project.current_transition.status === 'approved' ? 'Aprobado' : 'Rechazado'} por: <strong className="text-gray-700 dark:text-gray-300">{project.current_transition.approver?.full_name || 'Usuario'}</strong>
               </span>
               <span className="ml-2">
                 {new Date(project.current_transition.reviewed_at).toLocaleDateString('es-ES', {
@@ -189,7 +189,7 @@ export default function PhaseTransitionSemaphore({
         {!hasPendingTransition && nextPhase && canRequestTransition() && project.requires_approval && (
           <button
             onClick={() => setShowRequestModal(true)}
-            className="flex-1 bg-blue-900 hover:bg-blue-800 text-blue-400 px-4 py-2 rounded-md text-sm transition-colors border border-blue-600 hover:neon-glow-subtle font-medium"
+            className="flex-1 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-md text-sm transition-colors border border-blue-300 dark:border-blue-600 hover:neon-glow-subtle font-medium"
           >
             📤 Solicitar avance a {getPhaseLabel(nextPhase)}
           </button>
@@ -199,23 +199,23 @@ export default function PhaseTransitionSemaphore({
           <button
             onClick={() => handleRequestTransition()}
             disabled={isSubmitting}
-            className="flex-1 bg-green-900 hover:bg-green-800 text-green-400 px-4 py-2 rounded-md text-sm transition-colors border border-green-600 hover:neon-glow-subtle font-medium disabled:opacity-50"
+            className="flex-1 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 text-green-600 dark:text-green-400 px-4 py-2 rounded-md text-sm transition-colors border border-green-300 dark:border-green-600 hover:neon-glow-subtle font-medium disabled:opacity-50"
           >
             {isSubmitting ? '⏳ Procesando...' : `✅ Avanzar a ${getPhaseLabel(nextPhase)}`}
           </button>
         )}
-        
+
         {hasPendingTransition && canApproveTransition() && project.current_transition?.requested_by !== currentUser.id && (
           <button
             onClick={() => setShowReviewModal(true)}
-            className="flex-1 bg-orange-900 hover:bg-orange-800 text-orange-400 px-4 py-2 rounded-md text-sm transition-colors border border-orange-600 hover:neon-glow-subtle font-medium"
+            className="flex-1 bg-orange-100 dark:bg-orange-900 hover:bg-orange-200 dark:hover:bg-orange-800 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-md text-sm transition-colors border border-orange-300 dark:border-orange-600 hover:neon-glow-subtle font-medium"
           >
             👀 Revisar Solicitud
           </button>
         )}
 
         {!nextPhase && (
-          <div className="flex-1 text-center text-gray-400 text-sm py-2">
+          <div className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm py-2">
             🎉 Proyecto en fase final
           </div>
         )}
@@ -223,19 +223,19 @@ export default function PhaseTransitionSemaphore({
 
       {/* Modal de Solicitud */}
       {showRequestModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4 text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
               Solicitar Transición a {nextPhase && getPhaseLabel(nextPhase)}
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Esta solicitud será enviada para aprobación antes de realizar el cambio de fase.
             </p>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Comentario opcional sobre la solicitud (ej: tests completados, documentación actualizada)..."
-              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={4}
             />
             <div className="flex gap-3 mt-6">
@@ -244,7 +244,7 @@ export default function PhaseTransitionSemaphore({
                   setShowRequestModal(false);
                   setComment('');
                 }}
-                className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-md transition-colors"
+                className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md transition-colors"
                 disabled={isSubmitting}
               >
                 Cancelar
@@ -252,7 +252,7 @@ export default function PhaseTransitionSemaphore({
               <button
                 onClick={handleRequestTransition}
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-900 hover:bg-blue-800 text-blue-400 px-4 py-2 rounded-md transition-colors border border-blue-600 disabled:opacity-50"
+                className="flex-1 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-md transition-colors border border-blue-300 dark:border-blue-600 disabled:opacity-50"
               >
                 {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
               </button>
@@ -263,23 +263,23 @@ export default function PhaseTransitionSemaphore({
 
       {/* Modal de Revisión */}
       {showReviewModal && project.current_transition && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4 text-white">Revisar Transición</h3>
-            
-            <div className="mb-4 p-4 bg-gray-800 rounded-lg border border-gray-600">
-              <p className="text-sm text-white mb-2">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Revisar Transición</h3>
+
+            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+              <p className="text-sm text-gray-900 dark:text-white mb-2">
                 <strong>Solicitud:</strong> {project.current_transition.from_phase ? getPhaseLabel(project.current_transition.from_phase) : 'Inicial'} → {getPhaseLabel(project.current_transition.to_phase)}
               </p>
-              <p className="text-sm text-gray-300 mb-2">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                 <strong>Solicitado por:</strong> {project.current_transition.requester?.full_name}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 <strong>Fecha:</strong> {new Date(project.current_transition.requested_at).toLocaleDateString('es-ES')}
               </p>
               {project.current_transition.comment && (
-                <div className="mt-3 p-2 bg-gray-700 rounded">
-                  <p className="text-sm text-gray-300">
+                <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     <strong>Comentario:</strong> "{project.current_transition.comment}"
                   </p>
                 </div>
@@ -290,7 +290,7 @@ export default function PhaseTransitionSemaphore({
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Comentario sobre la decisión (opcional)..."
-              className="w-full p-3 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent mb-6"
+              className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent mb-6"
               rows={3}
             />
 
@@ -300,7 +300,7 @@ export default function PhaseTransitionSemaphore({
                   setShowReviewModal(false);
                   setComment('');
                 }}
-                className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-md transition-colors"
+                className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md transition-colors"
                 disabled={isSubmitting}
               >
                 Cancelar
@@ -308,14 +308,14 @@ export default function PhaseTransitionSemaphore({
               <button
                 onClick={() => handleReviewTransition(false)}
                 disabled={isSubmitting}
-                className="flex-1 bg-red-900 hover:bg-red-800 text-red-400 px-4 py-2 rounded-md transition-colors border border-red-600 disabled:opacity-50"
+                className="flex-1 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 text-red-600 dark:text-red-400 px-4 py-2 rounded-md transition-colors border border-red-300 dark:border-red-600 disabled:opacity-50"
               >
                 {isSubmitting ? 'Procesando...' : '❌ Rechazar'}
               </button>
               <button
                 onClick={() => handleReviewTransition(true)}
                 disabled={isSubmitting}
-                className="flex-1 bg-green-900 hover:bg-green-800 text-green-400 px-4 py-2 rounded-md transition-colors border border-green-600 disabled:opacity-50"
+                className="flex-1 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 text-green-600 dark:text-green-400 px-4 py-2 rounded-md transition-colors border border-green-300 dark:border-green-600 disabled:opacity-50"
               >
                 {isSubmitting ? 'Procesando...' : '✅ Aprobar'}
               </button>

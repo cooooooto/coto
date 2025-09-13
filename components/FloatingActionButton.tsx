@@ -76,8 +76,8 @@ export function ExpandableFloatingActionButton({
     <div className="fixed bottom-6 right-6 z-50 md:hidden">
       {/* Backdrop */}
       {isExpanded && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 -z-10"
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 z-40"
           onClick={() => setIsExpanded(false)}
         />
       )}

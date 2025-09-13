@@ -163,14 +163,14 @@ function ProjectsContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Mis Proyectos</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mis Proyectos</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-gray-900 rounded-lg border border-gray-700 p-6 animate-pulse">
-              <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
-              <div className="h-3 bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+            <div key={i} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           ))}
         </div>
@@ -204,8 +204,8 @@ function ProjectsContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white neon-text">Mis Proyectos</h1>
-          <p className="text-gray-300 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white neon-text">Mis Proyectos</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">
             {filteredProjects.length} de {projects.length} proyectos
           </p>
         </div>

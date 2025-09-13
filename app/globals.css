@@ -1,51 +1,26 @@
 @import "tailwindcss";
 
-/* Light theme (default) */
+/* Dark theme only (default) */
 :root {
-  --background: 255 255 255; /* white */
-  --background-secondary: 249 250 251; /* gray-50 */
-  --foreground: 17 24 39; /* gray-900 */
-  --foreground-secondary: 75 85 99; /* gray-600 */
-  --foreground-muted: 156 163 175; /* gray-400 */
-  
-  --border: 229 231 235; /* gray-200 */
-  --border-secondary: 209 213 219; /* gray-300 */
-  
-  --accent: 34 197 94; /* green-500 */
-  --accent-secondary: 22 163 74; /* green-600 */
-  --accent-muted: 187 247 208; /* green-200 */
-  
-  --success: 34 197 94; /* green-500 */
-  --success-foreground: 255 255 255; /* white */
-  
-  --warning: 245 158 11; /* amber-500 */
-  --warning-foreground: 255 255 255; /* white */
-  
-  --error: 239 68 68; /* red-500 */
-  --error-foreground: 255 255 255; /* white */
-}
-
-/* Dark theme */
-.dark {
   --background: 3 7 18; /* gray-950 */
   --background-secondary: 17 24 39; /* gray-900 */
   --foreground: 249 250 251; /* gray-50 */
   --foreground-secondary: 156 163 175; /* gray-400 */
   --foreground-muted: 107 114 128; /* gray-500 */
-  
+
   --border: 55 65 81; /* gray-700 */
   --border-secondary: 75 85 99; /* gray-600 */
-  
+
   --accent: 74 222 128; /* green-400 */
   --accent-secondary: 34 197 94; /* green-500 */
   --accent-muted: 20 83 45; /* green-900 */
-  
+
   --success: 74 222 128; /* green-400 */
   --success-foreground: 3 7 18; /* gray-950 */
-  
+
   --warning: 251 191 36; /* amber-400 */
   --warning-foreground: 3 7 18; /* gray-950 */
-  
+
   --error: 248 113 113; /* red-400 */
   --error-foreground: 3 7 18; /* gray-950 */
 }

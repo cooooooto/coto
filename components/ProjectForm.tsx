@@ -109,11 +109,11 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Errores */}
       {errors.length > 0 && (
-        <div className="bg-red-900 border border-red-600 rounded-md p-4 neon-glow-subtle">
-          <h3 className="text-sm font-medium text-red-400 mb-2">
+        <div className="bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-600 rounded-md p-4 neon-glow-subtle">
+          <h3 className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">
             Por favor corrige los siguientes errores:
           </h3>
-          <ul className="text-sm text-red-300 list-disc list-inside space-y-1">
+          <ul className="text-sm text-red-600 dark:text-red-300 list-disc list-inside space-y-1">
             {errors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
@@ -123,7 +123,7 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
 
       {/* Nombre del proyecto */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Nombre del proyecto *
         </label>
         <input
@@ -131,7 +131,7 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
           id="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
           placeholder="Mi Proyecto Full-Stack"
           required
         />
@@ -139,7 +139,7 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
 
       {/* Descripción */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Descripción (opcional)
         </label>
         <textarea
@@ -147,14 +147,14 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
           placeholder="Descripción breve del proyecto..."
         />
       </div>
 
       {/* Fecha límite */}
       <div>
-        <label htmlFor="deadline" className="block text-sm font-medium text-gray-300 mb-1">
+        <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Fecha límite *
         </label>
         <input
@@ -162,7 +162,7 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
           id="deadline"
           value={formData.deadline}
           onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
           required
         />
       </div>
@@ -170,14 +170,14 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
       {/* Estado y Fase */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Estado *
           </label>
           <select
             id="status"
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })}
-            className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
           >
             <option value="To-Do">To-Do</option>
             <option value="In-Progress">In-Progress</option>
@@ -186,14 +186,14 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
         </div>
 
         <div>
-          <label htmlFor="phase" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="phase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Fase *
           </label>
           <select
             id="phase"
             value={formData.phase}
             onChange={(e) => setFormData({ ...formData, phase: e.target.value as ProjectPhase })}
-            className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
           >
             <option value="DEV">Desarrollo</option>
             <option value="INT">Integración</option>
@@ -206,13 +206,13 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
       {/* Tareas */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Tareas *
           </label>
           <button
             type="button"
             onClick={addTask}
-            className="text-sm bg-green-900 hover:bg-green-800 text-green-400 px-3 py-1 rounded-md transition-all duration-300 border border-green-600 hover:neon-glow-subtle"
+            className="text-sm bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 text-green-600 dark:text-green-400 px-3 py-1 rounded-md transition-all duration-300 border border-green-300 dark:border-green-600 hover:neon-glow-subtle"
           >
             + Agregar tarea
           </button>
@@ -227,19 +227,19 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
                   value={task.name}
                   onChange={(e) => updateTask(task.id, { name: e.target.value })}
                   placeholder={`Tarea ${index + 1}`}
-                  className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
                 />
               </div>
-              
+
               {project && (
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={task.completed}
                     onChange={(e) => updateTask(task.id, { completed: e.target.checked })}
-                    className="rounded border-gray-600 text-green-500 focus:ring-green-500 bg-gray-800"
+                    className="rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 bg-white dark:bg-gray-800"
                   />
-                  <span className="text-sm text-gray-300">Completada</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Completada</span>
                 </label>
               )}
 
@@ -247,7 +247,7 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
                 <button
                   type="button"
                   onClick={() => removeTask(task.id)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
+                  className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors"
                   title="Eliminar tarea"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,12 +261,12 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
       </div>
 
       {/* Botones */}
-      <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-700">
+      <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700 transition-colors hover:border-green-500"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors hover:border-green-500"
             disabled={isSubmitting}
           >
             Cancelar

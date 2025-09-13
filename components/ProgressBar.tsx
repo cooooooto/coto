@@ -32,14 +32,14 @@ export default function ProgressBar({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className={`flex-1 bg-gray-800 rounded-full overflow-hidden ${sizeClasses[size]} border border-gray-700`}>
+      <div className={`flex-1 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden ${sizeClasses[size]} border border-gray-300 dark:border-gray-700`}>
         <div
           className={`${sizeClasses[size]} ${getProgressColor(normalizedProgress)} transition-all duration-300 ease-out`}
           style={{ width: `${normalizedProgress}%` }}
         />
       </div>
       {showPercentage && (
-        <span className="text-sm font-medium text-gray-300 min-w-[3rem] text-right">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[3rem] text-right">
           {Math.round(normalizedProgress)}%
         </span>
       )}

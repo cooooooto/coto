@@ -53,7 +53,7 @@ export default function ProjectCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex-1 min-w-0">
-          <Link 
+          <Link
             href={`/projects/${project.id}`}
             className="text-base sm:text-lg font-semibold text-white hover:text-green-400 transition-colors hover:neon-text block truncate"
           >
@@ -101,8 +101,8 @@ export default function ProjectCard({
             {project.tasks.slice(0, 3).map((task) => (
               <div key={task.id} className="flex items-center gap-2 text-sm">
                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                  task.completed 
-                    ? 'bg-green-500 border-green-500 text-black neon-glow-subtle' 
+                  task.completed
+                    ? 'bg-green-500 border-green-500 text-black neon-glow-subtle'
                     : 'border-gray-600'
                 }`}>
                   {task.completed && (

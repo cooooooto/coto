@@ -170,14 +170,14 @@ function HomeContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white neon-text">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white neon-text">Dashboard</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-gray-900 rounded-lg border border-gray-700 p-6 animate-pulse">
-              <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
-              <div className="h-3 bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+            <div key={i} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           ))}
         </div>
@@ -209,19 +209,19 @@ function HomeContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white neon-text">Dashboard</h1>
-          <p className="text-gray-300 mt-1 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white neon-text">Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">
             {filteredProjects.length} de {projects.length} proyectos
           </p>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 sm:p-6 neon-glow-subtle">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 neon-glow-subtle">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
           {/* Búsqueda */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               🔍 Buscar
             </label>
             <input
@@ -230,20 +230,20 @@ function HomeContent() {
               value={filters.search || ''}
               onChange={(e) => updateFilters({ search: e.target.value || undefined })}
               placeholder="Nombre o descripción..."
-              className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle touch-manipulation"
+              className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle touch-manipulation"
             />
           </div>
 
           {/* Filtro por estado */}
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Estado
             </label>
             <select
               id="status"
               value={filters.status || ''}
               onChange={(e) => updateFilters({ status: e.target.value as Project['status'] || undefined })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
             >
               <option value="">Todos los estados</option>
               <option value="To-Do">To-Do</option>
@@ -254,14 +254,14 @@ function HomeContent() {
 
           {/* Filtro por fase */}
           <div>
-            <label htmlFor="phase" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="phase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Fase
             </label>
             <select
               id="phase"
               value={filters.phase || ''}
               onChange={(e) => updateFilters({ phase: e.target.value as Project['phase'] || undefined })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
             >
               <option value="">Todas las fases</option>
               <option value="DEV">Desarrollo</option>
@@ -278,9 +278,9 @@ function HomeContent() {
                 type="checkbox"
                 checked={filters.overdue || false}
                 onChange={(e) => updateFilters({ overdue: e.target.checked || undefined })}
-                className="rounded border-gray-600 text-green-500 focus:ring-green-500 bg-gray-800"
+                className="rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 bg-white dark:bg-gray-800"
               />
-              <span className="text-sm font-medium text-gray-300">Solo vencidos</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Solo vencidos</span>
             </label>
           </div>
         </div>
@@ -301,14 +301,14 @@ function HomeContent() {
       {/* Lista de proyectos */}
       {filteredProjects.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
-          <div className="bg-gray-800 rounded-lg p-6 sm:p-8 border border-gray-700">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
             <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <h3 className="text-base sm:text-lg font-medium text-white mb-2">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
               {projects.length === 0 ? 'No hay proyectos' : 'No se encontraron proyectos'}
             </h3>
-            <p className="text-sm sm:text-base text-gray-300 mb-6 px-2">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-6 px-2">
               {projects.length === 0 
                 ? 'Comienza creando tu primer proyecto de desarrollo.'
                 : 'Intenta ajustar los filtros para encontrar lo que buscas.'
@@ -355,14 +355,14 @@ export default function Home() {
     <Suspense fallback={
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white neon-text">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white neon-text">Dashboard</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-gray-900 rounded-lg border border-gray-700 p-6 animate-pulse">
-              <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
-              <div className="h-3 bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+            <div key={i} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           ))}
         </div>
