@@ -46,15 +46,22 @@ export function addNotification(
   setUnreadCount((prev) => prev + 1);
 
   // Intentar disparar push notification si está permitido
-  if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+  if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
     try {
-      new Notification(title, { body: message, icon: '/icon.png' }); // Icono opcional
+      // Verificar que estamos en un contexto seguro (HTTPS o localhost)
+      if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+        new Notification(title, {
+          body: message,
+          icon: '/icon.png',
+          tag: 'devtracker-notification' // Evitar notificaciones duplicadas
+        });
+      }
     } catch (error) {
       console.warn('Error al enviar push notification:', error);
       // No bloquear el flujo; solo loguear
     }
   } else {
-    console.log('Permiso para notificaciones no concedido; notificación solo local.');
+    console.log('Permiso para notificaciones no concedido o API no disponible; notificación solo local.');
   }
 }
 
