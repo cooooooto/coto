@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Project, ProjectPhase, PhaseTransition, Profile, TRANSITION_COLORS, PHASE_COLORS } from '@/types/project';
+import { useNotifications } from './RealtimeNotifications';
 
 interface PhaseTransitionSemaphoreProps {
   project: Project;
@@ -10,12 +11,13 @@ interface PhaseTransitionSemaphoreProps {
   onReviewTransition: (transitionId: string, approved: boolean, comment?: string) => Promise<void>;
 }
 
-export default function PhaseTransitionSemaphore({ 
-  project, 
-  currentUser, 
-  onRequestTransition, 
-  onReviewTransition 
+export default function PhaseTransitionSemaphore({
+  project,
+  currentUser,
+  onRequestTransition,
+  onReviewTransition
 }: PhaseTransitionSemaphoreProps) {
+  const { addNotification } = useNotifications();
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [comment, setComment] = useState('');
@@ -59,10 +61,18 @@ export default function PhaseTransitionSemaphore({
 
   const handleRequestTransition = async () => {
     if (!nextPhase) return;
-    
+
     setIsSubmitting(true);
     try {
       await onRequestTransition(nextPhase, comment);
+      // Agregar notificación cuando se solicita una transición
+      addNotification(
+        'project_updated',
+        'Transición de fase solicitada',
+        `Se solicitó el avance del proyecto "${project.name}" a fase "${getPhaseLabel(nextPhase)}"`,
+        project.name,
+        project.id
+      );
       setComment('');
       setShowRequestModal(false);
     } catch (error) {
@@ -74,10 +84,21 @@ export default function PhaseTransitionSemaphore({
 
   const handleReviewTransition = async (approved: boolean) => {
     if (!project.current_transition) return;
-    
+
     setIsSubmitting(true);
     try {
       await onReviewTransition(project.current_transition.id, approved, comment);
+      // Agregar notificación cuando se revisa una transición
+      const actionText = approved ? 'aprobada' : 'rechazada';
+      const actionEmoji = approved ? '✅' : '❌';
+
+      addNotification(
+        'project_updated',
+        `Transición ${actionText}`,
+        `${actionEmoji} La transición del proyecto "${project.name}" a fase "${getPhaseLabel(project.current_transition.to_phase)}" ha sido ${actionText}`,
+        project.name,
+        project.id
+      );
       setComment('');
       setShowReviewModal(false);
     } catch (error) {

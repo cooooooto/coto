@@ -1,11 +1,12 @@
-// Componente para mostrar notificaciones de cambios en tiempo real
+// Componente para mostrar notificaciones locales manuales
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { X, Bell, User, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 
-interface RealtimeNotification {
+interface Notification {
   id: string;
   type: 'project_created' | 'project_updated' | 'project_deleted' | 'task_updated' | 'task_completed';
   title: string;
@@ -20,59 +21,62 @@ interface RealtimeNotificationsProps {
   className?: string;
 }
 
-export default function RealtimeNotifications({ className = '' }: RealtimeNotificationsProps) {
-  const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+// Función manual para agregar notificaciones - Exportada para uso externo
+export function addNotification(
+  setNotifications: Dispatch<SetStateAction<Notification[]>>,
+  setUnreadCount: Dispatch<SetStateAction<number>>,
+  type: Notification['type'],
+  title: string,
+  message: string,
+  projectName?: string,
+  projectId: string = 'default-id'
+) {
+  const newNotification: Notification = {
+    id: Date.now().toString(),
+    type,
+    title,
+    message,
+    projectName,
+    timestamp: new Date(),
+    projectId,
+    read: false,
+  };
+
+  setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]); // Mantener solo 10
+  setUnreadCount((prev) => prev + 1);
+
+  // Intentar disparar push notification si está permitido
+  if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+    try {
+      new Notification(title, { body: message, icon: '/icon.png' }); // Icono opcional
+    } catch (error) {
+      console.warn('Error al enviar push notification:', error);
+      // No bloquear el flujo; solo loguear
+    }
+  } else {
+    console.log('Permiso para notificaciones no concedido; notificación solo local.');
+  }
+}
+
+// Hook personalizado para manejar notificaciones
+export function useNotifications() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Simular notificaciones para demo (en producción vendría del hook de realtime)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Solo para demo - en producción esto vendría de Supabase Realtime
-      if (Math.random() > 0.95) { // 5% chance cada segundo
-        const mockNotifications = [
-          {
-            type: 'task_completed' as const,
-            title: 'Tarea completada',
-            message: 'Se completó "Setup inicial del proyecto" en E-commerce App',
-            projectName: 'E-commerce App'
-          },
-          {
-            type: 'project_updated' as const,
-            title: 'Proyecto actualizado',
-            message: 'Blog Personal cambió a fase de Integración',
-            projectName: 'Blog Personal'
-          },
-          {
-            type: 'task_updated' as const,
-            title: 'Nueva tarea',
-            message: 'Se agregó "Testing unitario" a API REST',
-            projectName: 'API REST'
-          }
-        ];
-
-        const randomNotification = mockNotifications[Math.floor(Math.random() * mockNotifications.length)];
-        
-        const newNotification: RealtimeNotification = {
-          id: Date.now().toString(),
-          ...randomNotification,
-          timestamp: new Date(),
-          projectId: 'demo-id',
-          read: false,
-        };
-
-        setNotifications(prev => [newNotification, ...prev.slice(0, 9)]); // Mantener solo 10
-        setUnreadCount(prev => prev + 1);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const addNotificationHandler = (
+    type: Notification['type'],
+    title: string,
+    message: string,
+    projectName?: string,
+    projectId: string = 'default-id'
+  ) => {
+    addNotification(setNotifications, setUnreadCount, type, title, message, projectName, projectId);
+  };
 
   const markAsRead = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId 
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.id === notificationId
           ? { ...notif, read: true }
           : notif
       )
@@ -93,7 +97,21 @@ export default function RealtimeNotifications({ className = '' }: RealtimeNotifi
     setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
   };
 
-  const getNotificationIcon = (type: RealtimeNotification['type']) => {
+  return {
+    notifications,
+    unreadCount,
+    addNotification: addNotificationHandler,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+  };
+}
+
+export default function RealtimeNotifications({ className = '' }: RealtimeNotificationsProps) {
+  const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'task_completed':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
@@ -228,7 +246,7 @@ export default function RealtimeNotifications({ className = '' }: RealtimeNotifi
             {notifications.length > 0 && (
               <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                 <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-                  💡 Las actualizaciones aparecen automáticamente cuando otros usuarios hacen cambios
+                  💡 Las notificaciones aparecen solo cuando realizas acciones específicas
                 </p>
               </div>
             )}

@@ -13,6 +13,7 @@ interface LazyProjectCardProps {
   onUpdatePhase?: (projectId: string, phase: Project['phase']) => Promise<void>;
   onDelete?: (projectId: string) => Promise<void>;
   index?: number;
+  isUpdating?: boolean;
 }
 
 // Skeleton component para loading
@@ -63,13 +64,13 @@ function ProjectCardSkeleton() {
   );
 }
 
-function LazyProjectCard({ project, onUpdateStatus, onUpdatePhase, onDelete, index = 0 }: LazyProjectCardProps) {
+function LazyProjectCard({ project, onUpdateStatus, onUpdatePhase, onDelete, index = 0, isUpdating = false }: LazyProjectCardProps) {
   return (
     <Suspense fallback={<ProjectCardSkeleton />}>
-      <div 
-        style={{ 
+      <div
+        style={{
           // Stagger animation delay based on index
-          animationDelay: `${index * 50}ms` 
+          animationDelay: `${index * 50}ms`
         }}
         className="animate-fade-in-up"
       >
@@ -78,6 +79,7 @@ function LazyProjectCard({ project, onUpdateStatus, onUpdatePhase, onDelete, ind
           onUpdateStatus={onUpdateStatus}
           onUpdatePhase={onUpdatePhase}
           onDelete={onDelete}
+          isUpdating={isUpdating}
         />
       </div>
     </Suspense>
@@ -94,6 +96,7 @@ export default memo(LazyProjectCard, (prevProps, nextProps) => {
     prevProps.project.phase === nextProps.project.phase &&
     prevProps.project.progress === nextProps.project.progress &&
     prevProps.project.updatedAt === nextProps.project.updatedAt &&
-    prevProps.project.tasks.length === nextProps.project.tasks.length
+    prevProps.project.tasks.length === nextProps.project.tasks.length &&
+    prevProps.isUpdating === nextProps.isUpdating
   );
 });

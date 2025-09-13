@@ -84,10 +84,18 @@ export async function PATCH(
 
     // For complex updates, convert to CreateProjectData format if needed
     let updateData: Partial<CreateProjectData> = {};
-    
+
     if (body.name !== undefined) updateData.name = body.name;
     if (body.description !== undefined) updateData.description = body.description;
-    if (body.deadline !== undefined) updateData.deadline = body.deadline.toISOString();
+    if (body.deadline !== undefined) {
+      // Handle deadline as either Date object or ISO string
+      const deadline = typeof body.deadline === 'string'
+        ? new Date(body.deadline)
+        : body.deadline instanceof Date
+          ? body.deadline
+          : new Date(body.deadline);
+      updateData.deadline = deadline.toISOString();
+    }
     if (body.status !== undefined) updateData.status = body.status;
     if (body.phase !== undefined) updateData.phase = body.phase;
     if (body.tasks !== undefined) {
@@ -110,7 +118,9 @@ export async function PATCH(
 
       const dataToValidate = {
         name: updateData.name ?? existingProject.name,
-        deadline: updateData.deadline ?? existingProject.deadline.toISOString(),
+        deadline: updateData.deadline ?? (typeof existingProject.deadline === 'string'
+          ? existingProject.deadline
+          : existingProject.deadline.toISOString()),
         status: updateData.status ?? existingProject.status,
         phase: updateData.phase ?? existingProject.phase,
         tasks: updateData.tasks ?? existingProject.tasks.map(t => ({ name: t.name, completed: t.completed }))

@@ -11,12 +11,14 @@ import ProgressBar from '@/components/ProgressBar';
 import { StatusBadge, PhaseBadge } from '@/components/StatusBadge';
 import PhaseTransitionSemaphore from '@/components/PhaseTransitionSemaphore';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useNotifications } from '@/components/RealtimeNotifications';
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const projectId = params.id as string;
   const { currentUser, loading: userLoading } = useCurrentUser();
+  const { addNotification } = useNotifications();
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,9 +55,12 @@ export default function ProjectDetailPage() {
   const handleToggleTask = async (taskId: string, completed: boolean) => {
     if (!project || updating) return;
 
+    const task = project.tasks.find(t => t.id === taskId);
+    if (!task) return;
+
     try {
       setUpdating(true);
-      
+
       const updatedTasks = project.tasks.map(task =>
         task.id === taskId ? { ...task, completed } : task
       );
@@ -72,6 +77,26 @@ export default function ProjectDetailPage() {
 
       const updatedProject = await response.json();
       setProject(updatedProject);
+
+      // Agregar notificación especial si se completa una tarea en fase PROD
+      if (completed && project.phase === 'PROD') {
+        addNotification(
+          'task_completed',
+          '🎉 Tarea Finalizada en Producción',
+          `La tarea "${task.name}" ha sido completada exitosamente en la fase de Producción del proyecto "${project.name}"`,
+          project.name,
+          project.id
+        );
+      } else if (completed) {
+        // Notificación normal para otras fases
+        addNotification(
+          'task_completed',
+          'Tarea completada',
+          `La tarea "${task.name}" ha sido completada en el proyecto "${project.name}"`,
+          project.name,
+          project.id
+        );
+      }
     } catch (err) {
       alert('Error al actualizar la tarea');
     } finally {
@@ -251,6 +276,7 @@ export default function ProjectDetailPage() {
 
   const isOverdue = isProjectOverdue(project.deadline);
   const completedTasks = project.tasks.filter(task => task.completed).length;
+  const prodCompletedTasks = project.tasks.filter(task => task.completed && project.phase === 'PROD');
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -363,22 +389,70 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
+      {/* Completed Tasks in Production - Special Section */}
+      {project.phase === 'PROD' && prodCompletedTasks.length > 0 && (
+        <div className="bg-gradient-to-r from-green-900 to-lime-900 rounded-lg border border-green-600 neon-glow-subtle p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-white neon-text">
+              🎉 Tareas Finalizadas en Producción ({prodCompletedTasks.length})
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {prodCompletedTasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex items-center gap-4 p-4 rounded-lg border border-green-500 bg-green-50 dark:bg-green-900/20"
+              >
+                <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-green-500 bg-green-500 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+
+                <span className="flex-1 text-green-800 dark:text-green-200 font-medium">
+                  {task.name}
+                </span>
+
+                <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+                  <span>✅ Finalizada</span>
+                  <span>•</span>
+                  <span>{new Date(task.createdAt).toLocaleDateString('es-ES')}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Tasks */}
       <div className="bg-gray-900 rounded-lg border border-gray-700 neon-glow-subtle p-6">
         <h2 className="text-xl font-semibold text-white mb-4 neon-text">
-          Tareas ({completedTasks}/{project.tasks.length})
+          Tareas ({
+            project.phase === 'PROD'
+              ? `${project.tasks.filter(t => !t.completed).length}/${project.tasks.length}`
+              : `${completedTasks}/${project.tasks.length}`
+          })
         </h2>
         
         {project.tasks.length === 0 ? (
           <p className="text-gray-400 text-center py-8">No hay tareas definidas para este proyecto.</p>
         ) : (
           <div className="space-y-3">
-            {project.tasks.map((task) => (
+            {project.tasks
+              // Filtrar tareas que ya están en "finalizadas" si estamos en PROD
+              .filter(task => !(project.phase === 'PROD' && task.completed))
+              .map((task) => (
               <div
                 key={task.id}
                 className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
-                  task.completed 
-                    ? 'bg-green-50 border-green-200' 
+                  task.completed
+                    ? 'bg-green-50 border-green-200'
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                 }`}
               >
@@ -397,11 +471,11 @@ export default function ProjectDetailPage() {
                     </svg>
                   )}
                 </button>
-                
+
                 <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                   {task.name}
                 </span>
-                
+
                 <span className="text-xs text-gray-400">
                   {new Date(task.createdAt).toLocaleDateString('es-ES')}
                 </span>

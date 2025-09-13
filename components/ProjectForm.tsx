@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Project, ProjectStatus, ProjectPhase, CreateProjectData } from '@/types/project';
 import { generateId } from '@/lib/projects';
+import { useNotifications } from './RealtimeNotifications';
 
 interface ProjectFormProps {
   project?: Project; // Para edición
@@ -21,12 +22,13 @@ interface TaskInput {
 }
 
 export default function ProjectForm({ project, initialData, onSubmit, onCancel, isSubmitting = false }: ProjectFormProps) {
+  const { addNotification } = useNotifications();
   const [formData, setFormData] = useState({
     name: project?.name || initialData?.name || '',
     description: project?.description || initialData?.description || '',
-    deadline: project?.deadline 
-      ? new Date(project.deadline).toISOString().split('T')[0] 
-      : initialData?.deadline 
+    deadline: project?.deadline
+      ? new Date(project.deadline).toISOString().split('T')[0]
+      : initialData?.deadline
         ? new Date(initialData.deadline).toISOString().split('T')[0]
         : '',
     status: project?.status || initialData?.status || 'To-Do' as ProjectStatus,
@@ -88,7 +90,30 @@ export default function ProjectForm({ project, initialData, onSubmit, onCancel, 
       }))
     };
 
+    // Llamar a la función de envío
     onSubmit(submitData);
+
+    // Agregar notificación después del envío exitoso
+    const projectName = formData.name.trim();
+    if (project) {
+      // Actualización de proyecto existente
+      addNotification(
+        'project_updated',
+        'Proyecto actualizado',
+        `El proyecto "${projectName}" ha sido actualizado exitosamente`,
+        projectName,
+        project.id
+      );
+    } else {
+      // Creación de nuevo proyecto
+      addNotification(
+        'project_created',
+        'Proyecto creado',
+        `El proyecto "${projectName}" ha sido creado exitosamente`,
+        projectName,
+        'new-project-id' // Se actualizará cuando se reciba el ID real
+      );
+    }
   };
 
   const addTask = () => {
