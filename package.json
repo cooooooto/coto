@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
+    "test": "echo 'No tests specified yet - add your test command here'",
     "verify-environments": "node scripts/verify-environments.js",
     "seed-dev": "node scripts/seed-dev-data.js",
     "reset-dev": "node scripts/seed-dev-data.js --reset",
