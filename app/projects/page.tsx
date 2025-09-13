@@ -243,11 +243,11 @@ function ProjectsContent() {
       )}
 
       {/* Filtros */}
-      <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 neon-glow-subtle">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="bg-gray-900 rounded-lg border border-gray-700 p-3 neon-glow-subtle">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Búsqueda */}
-          <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
+          <div className="flex-1 min-w-[200px]">
+            <label htmlFor="search" className="block text-xs font-medium text-gray-400 mb-0.5">
               Buscar
             </label>
             <input
@@ -256,40 +256,40 @@ function ProjectsContent() {
               value={filters.search || ''}
               onChange={(e) => updateFilters({ search: e.target.value || undefined })}
               placeholder="Nombre o descripción..."
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+              className="w-full px-2 py-1.5 text-sm border border-gray-600 bg-gray-800 text-white rounded shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
             />
           </div>
 
           {/* Filtro por estado */}
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-1">
+          <div className="min-w-[140px]">
+            <label htmlFor="status" className="block text-xs font-medium text-gray-400 mb-0.5">
               Estado
             </label>
             <select
               id="status"
               value={filters.status || ''}
               onChange={(e) => updateFilters({ status: e.target.value as Project['status'] || undefined })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+              className="w-full px-2 py-1.5 text-sm border border-gray-600 bg-gray-800 text-white rounded shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
             >
-              <option value="">Todos los estados</option>
+              <option value="">Todos</option>
               <option value="To-Do">To-Do</option>
-              <option value="In-Progress">In-Progress</option>
-              <option value="Done">Done</option>
+              <option value="In-Progress">En Progreso</option>
+              <option value="Done">Completado</option>
             </select>
           </div>
 
           {/* Filtro por fase */}
-          <div>
-            <label htmlFor="phase" className="block text-sm font-medium text-gray-300 mb-1">
+          <div className="min-w-[140px]">
+            <label htmlFor="phase" className="block text-xs font-medium text-gray-400 mb-0.5">
               Fase
             </label>
             <select
               id="phase"
               value={filters.phase || ''}
               onChange={(e) => updateFilters({ phase: e.target.value as Project['phase'] || undefined })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-white rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
+              className="w-full px-2 py-1.5 text-sm border border-gray-600 bg-gray-800 text-white rounded shadow-sm focus:ring-green-500 focus:border-green-500 focus:neon-glow-subtle"
             >
-              <option value="">Todas las fases</option>
+              <option value="">Todas</option>
               <option value="DEV">Desarrollo</option>
               <option value="INT">Integración</option>
               <option value="PRE">Pre-Producción</option>
@@ -298,30 +298,28 @@ function ProjectsContent() {
           </div>
 
           {/* Filtro por vencidos */}
-          <div className="flex items-end">
-            <label className="flex items-center gap-2">
+          <div className="flex items-center">
+            <label className="flex items-center gap-1.5">
               <input
                 type="checkbox"
                 checked={filters.overdue || false}
                 onChange={(e) => updateFilters({ overdue: e.target.checked || undefined })}
                 className="rounded border-gray-600 text-green-500 focus:ring-green-500 bg-gray-800"
               />
-              <span className="text-sm font-medium text-gray-700">Solo vencidos</span>
+              <span className="text-xs font-medium text-gray-300">Solo vencidos</span>
             </label>
           </div>
-        </div>
 
-        {/* Limpiar filtros */}
-        {hasActiveFilters && (
-          <div className="flex justify-end">
+          {/* Limpiar filtros */}
+          {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-sm text-green-400 hover:text-green-300 transition-colors"
+              className="text-xs text-green-400 hover:text-green-300 transition-colors ml-2"
             >
-              Limpiar filtros
+              Limpiar
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Lista de proyectos */}
