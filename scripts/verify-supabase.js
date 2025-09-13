@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Script para verificar la configuración de Supabase
+ * Script para verificar la configuración de Supabase (compatibilidad hacia atrás)
  * Ejecuta: node scripts/verify-supabase.js
+ * Para verificación completa de entornos: node scripts/verify-environments.js
  */
 
 const { createClient } = require('@supabase/supabase-js');

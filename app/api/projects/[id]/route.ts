@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getDemoProject, updateDemoProject, isDemoMode } from '@/lib/demo-data';
-import { SupabaseService } from '@/lib/supabase-service';
+import { DatabaseService } from '@/lib/database-service';
 import { validateProjectData } from '@/lib/projects';
 import { UpdateProjectData, CreateProjectData } from '@/types/project';
 
@@ -28,7 +28,7 @@ export async function GET(
       return NextResponse.json(project);
     }
     
-    const project = await SupabaseService.getProject(id);
+    const project = await DatabaseService.getProject(id);
 
     if (!project) {
       return NextResponse.json(
@@ -73,12 +73,12 @@ export async function PATCH(
 
     // Check if it's a simple status or phase update
     if (body.status !== undefined && Object.keys(body).length === 1) {
-      const updatedProject = await SupabaseService.updateProjectStatus(id, body.status);
+      const updatedProject = await DatabaseService.updateProject(id, { status: body.status });
       return NextResponse.json(updatedProject);
     }
 
     if (body.phase !== undefined && Object.keys(body).length === 1) {
-      const updatedProject = await SupabaseService.updateProjectPhase(id, body.phase);
+      const updatedProject = await DatabaseService.updateProject(id, { phase: body.phase });
       return NextResponse.json(updatedProject);
     }
 
@@ -100,7 +100,7 @@ export async function PATCH(
     // Validate data if critical fields are being updated
     if (updateData.name !== undefined || updateData.deadline !== undefined || 
         updateData.status !== undefined || updateData.phase !== undefined) {
-      const existingProject = await SupabaseService.getProject(id);
+      const existingProject = await DatabaseService.getProject(id);
       if (!existingProject) {
         return NextResponse.json(
           { error: 'Project not found' },
@@ -126,7 +126,7 @@ export async function PATCH(
     }
 
     // Update project
-    const updatedProject = await SupabaseService.updateProject(id, updateData);
+    const updatedProject = await DatabaseService.updateProject(id, updateData);
     return NextResponse.json(updatedProject);
   } catch (error) {
     console.error('Error updating project:', error);
@@ -151,7 +151,7 @@ export async function DELETE(
     }
     
     // Check if project exists
-    const existingProject = await SupabaseService.getProject(id);
+    const existingProject = await DatabaseService.getProject(id);
     if (!existingProject) {
       return NextResponse.json(
         { error: 'Project not found' },
@@ -159,7 +159,7 @@ export async function DELETE(
       );
     }
 
-    await SupabaseService.deleteProject(id);
+    await DatabaseService.deleteProject(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting project:', error);

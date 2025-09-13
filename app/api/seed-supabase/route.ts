@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { SupabaseService } from '@/lib/supabase-service';
+import { DatabaseService } from '@/lib/database-service';
 
 export async function POST() {
   try {
@@ -49,7 +49,7 @@ export async function POST() {
     const createdProjects = [];
     
     for (const projectData of sampleProjects) {
-      const project = await SupabaseService.createProject(projectData);
+      const project = await DatabaseService.createProject(projectData);
       createdProjects.push(project);
     }
 

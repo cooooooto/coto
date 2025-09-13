@@ -15,7 +15,9 @@ La aplicación funciona en **modo demo** por defecto con:
 - ✅ **Todas las características** visibles y usables
 - ✅ **Cero configuración** requerida
 
-Para habilitar persistencia de datos, configura Supabase siguiendo la [guía de configuración](#configuración-de-supabase). 
+Para habilitar persistencia de datos, tienes dos opciones:
+- **Supabase**: Sigue la [guía de configuración](#configuración-de-supabase)
+- **Neon** (recomendado): Usa la [guía de migración](./NEON_MIGRATION_GUIDE.md) 
 
 📖 **Más información**: [DEMO_MODE.md](./DEMO_MODE.md)
 
@@ -249,6 +251,15 @@ npm start
 
 # Linting
 npm run lint
+
+# Migración a Neon (recomendado)
+npm run migrate-to-neon
+
+# Backup de Supabase
+npm run backup-supabase
+
+# Configurar Neon manualmente
+npm run setup-neon
 
 # Resetear datos (eliminar data/projects.json)
 rm data/projects.json

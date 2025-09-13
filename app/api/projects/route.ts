@@ -3,11 +3,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { demoProjects, isDemoMode } from '@/lib/demo-data';
 import { 
-  SupabaseService, 
-  SupabaseConfigError, 
-  SupabaseNetworkError, 
-  SupabaseDataError 
-} from '@/lib/supabase-service';
+  DatabaseService, 
+  DatabaseConfigError, 
+  DatabaseConnectionError, 
+  DatabaseOperationError 
+} from '@/lib/database-service';
 import { validateProjectData } from '@/lib/projects';
 import { CreateProjectData } from '@/types/project';
 
@@ -35,8 +35,8 @@ export async function GET() {
       return NextResponse.json(demoProjects);
     }
     
-    console.log('[API] Running in PRODUCTION mode - connecting to Supabase');
-    const projects = await SupabaseService.getProjects();
+    console.log('[API] Running in PRODUCTION mode - connecting to database');
+    const projects = await DatabaseService.getProjects();
     
     const duration = Date.now() - startTime;
     console.log(`[API] GET /api/projects - Success in ${duration}ms, returned ${projects.length} projects`);
@@ -47,31 +47,31 @@ export async function GET() {
     logAPIError('GET /api/projects', error);
     
     // Handle specific error types with appropriate responses
-    if (error instanceof SupabaseConfigError) {
+    if (error instanceof DatabaseConfigError) {
       return NextResponse.json(
         { 
           error: 'Configuration Error',
           details: error.message,
-          help: 'Please check your Supabase environment variables. See SUPABASE_SETUP.md for instructions.',
+          help: 'Please check your database environment variables. See ENVIRONMENT_SETUP.md for instructions.',
           type: 'config'
         },
         { status: 500 }
       );
     }
     
-    if (error instanceof SupabaseNetworkError) {
+    if (error instanceof DatabaseConnectionError) {
       return NextResponse.json(
         { 
           error: 'Database Connection Failed',
           details: error.message,
-          help: 'This might be due to network issues or incorrect Supabase URL/keys.',
+          help: 'This might be due to network issues or incorrect database connection string.',
           type: 'network'
         },
         { status: 503 } // Service Unavailable
       );
     }
     
-    if (error instanceof SupabaseDataError) {
+    if (error instanceof DatabaseOperationError) {
       return NextResponse.json(
         { 
           error: 'Database Query Failed',
@@ -88,8 +88,8 @@ export async function GET() {
       return NextResponse.json(
         { 
           error: 'Database Connection Failed',
-          details: 'Unable to connect to Supabase. Please check your configuration.',
-          help: 'Verify SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment variables.',
+          details: 'Unable to connect to database. Please check your configuration.',
+          help: 'Verify DATABASE_URL and NEON_DATABASE_URL in your environment variables.',
           type: 'legacy_fetch'
         },
         { status: 503 }
@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear proyecto usando Supabase
-    const project = await SupabaseService.createProject(body);
+    // Crear proyecto usando DatabaseService
+    const project = await DatabaseService.createProject(body);
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {

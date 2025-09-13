@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseService } from '@/lib/supabase-service';
+import { DatabaseService as DatabaseService } from '@/lib/database-service';
 
 // GET /api/transitions/pending?userId=xxx - Get pending transitions for a user
 export async function GET(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const transitions = await SupabaseService.getPendingTransitionsForUser(userId);
+    const transitions = await DatabaseService.getPendingTransitionsForUser(userId);
     
     return NextResponse.json(transitions);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseService } from '@/lib/supabase-service';
+import { DatabaseService as DatabaseService } from '@/lib/database-service';
 import { ProjectPhase } from '@/types/project';
 
 // POST /api/projects/[id]/transitions - Request phase transition
@@ -55,7 +55,7 @@ export async function POST(
       );
     }
 
-    const transition = await SupabaseService.requestPhaseTransition(
+    const transition = await DatabaseService.requestPhaseTransition(
       projectId,
       toPhase,
       requestedBy,
@@ -80,7 +80,7 @@ export async function GET(
   try {
     const { id: projectId } = await params;
     
-    const transitions = await SupabaseService.getProjectTransitionHistory(projectId);
+    const transitions = await DatabaseService.getProjectTransitionHistory(projectId);
     
     return NextResponse.json(transitions);
   } catch (error) {

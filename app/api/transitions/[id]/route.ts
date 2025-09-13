@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseService } from '@/lib/supabase-service';
+import { DatabaseService as DatabaseService } from '@/lib/database-service';
 
 // PATCH /api/transitions/[id] - Review phase transition
 export async function PATCH(
@@ -52,7 +52,7 @@ export async function PATCH(
       );
     }
 
-    const transition = await SupabaseService.reviewPhaseTransition(
+    const transition = await DatabaseService.reviewPhaseTransition(
       transitionId,
       approved,
       reviewedBy,
@@ -77,7 +77,7 @@ export async function GET(
   try {
     const { id: transitionId } = await params;
     
-    // This would require a new method in SupabaseService to get a single transition
+    // This would require a new method in DatabaseService to get a single transition
     // For now, we'll return a simple response
     return NextResponse.json({ message: 'Transition details endpoint - to be implemented' });
   } catch (error) {

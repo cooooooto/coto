@@ -95,9 +95,13 @@ export const demoProjects: Project[] = [
 ];
 
 export const isDemoMode = (): boolean => {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co' ||
-         !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-         process.env.NODE_ENV === 'development';
+  // Verificar si hay configuración de base de datos (Neon o Supabase)
+  const hasDatabaseConfig = !!(process.env.NEON_DATABASE_URL || 
+                              process.env.DATABASE_URL || 
+                              process.env.NEXT_PUBLIC_SUPABASE_URL);
+  
+  // Solo usar demo si no hay configuración de BD
+  return !hasDatabaseConfig;
 };
 
 export const getDemoProject = (id: string): Project | null => {

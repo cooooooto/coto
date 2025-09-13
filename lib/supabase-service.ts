@@ -1,15 +1,19 @@
-import { supabaseAdmin, supabaseConfigValid as configValid } from './supabase';
+import { supabaseAdmin } from './supabase';
 import { Project, CreateProjectData, Task, PhaseTransition, ProjectPhase, TransitionStatus, Profile } from '@/types/project';
 import { calculateProjectProgress } from './projects';
 import { Database } from '@/types/database';
 
 // Helper function for config validation
 function supabaseConfigValid(): boolean {
-  // In development, be more lenient to avoid blocking functionality
-  if (process.env.NODE_ENV === 'development') {
-    return true;
-  }
-  return configValid;
+  // Verificar si las variables de Supabase están configuradas
+  const hasUrl = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && 
+                   !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder'));
+  const hasAnonKey = !!(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && 
+                       !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes('placeholder'));
+  const hasServiceKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY && 
+                          !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('placeholder'));
+  
+  return hasUrl && hasAnonKey && hasServiceKey;
 }
 
 // Enhanced error types for better debugging
