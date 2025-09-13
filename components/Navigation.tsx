@@ -37,7 +37,7 @@ export default function Navigation() {
   }, [isMobileMenuOpen]);
 
   return (
-    <nav className="bg-gray-950 border-b border-gray-700 sticky top-0 z-50 backdrop-blur-sm shadow-sm shadow-green-400/10">
+    <nav className="hidden md:block bg-gray-950 border-b border-gray-700 sticky top-0 z-50 backdrop-blur-sm shadow-sm shadow-green-400/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Title */}
