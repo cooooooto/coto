@@ -83,7 +83,7 @@ export async function PATCH(
     }
 
     // For complex updates, convert to CreateProjectData format if needed
-    let updateData: Partial<CreateProjectData> = {};
+    const updateData: Partial<CreateProjectData> = {};
 
     if (body.name !== undefined) updateData.name = body.name;
     if (body.description !== undefined) updateData.description = body.description;

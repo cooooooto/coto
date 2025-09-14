@@ -1,6 +1,5 @@
 import { Project, CreateProjectData, Task, PhaseTransition, ProjectPhase, TransitionStatus, Profile } from '@/types/project';
 import { calculateProjectProgress } from './projects';
-import { Database } from '@/types/database';
 
 // Importar servicios de Neon
 import { neonSql, executeQuery, withTransaction } from './neon-config';
