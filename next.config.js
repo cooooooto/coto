@@ -40,7 +40,7 @@ const nextConfig = {
 
   // Optimizaciones de rendimiento
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false, // Temporalmente deshabilitado para evitar errores de critters
     scrollRestoration: true,
   },
 };

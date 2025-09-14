@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DatabaseService as DatabaseService } from '@/lib/database-service';
 
+// Forzar renderizado dinámico ya que usa parámetros de búsqueda
+export const dynamic = 'force-dynamic';
+
 // GET /api/transitions/pending?userId=xxx - Get pending transitions for a user
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const userId = searchParams.get('userId');
 
     if (!userId) {

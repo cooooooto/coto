@@ -3,9 +3,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jiraService } from '@/lib/jira-service';
 
+// Forzar renderizado dinámico ya que usa parámetros de búsqueda
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const action = searchParams.get('action');
 
     if (!jiraService.isAvailable()) {
@@ -138,7 +141,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const action = searchParams.get('action');
 
     if (!jiraService.isAvailable()) {
