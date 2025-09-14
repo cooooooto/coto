@@ -45,21 +45,21 @@ function MetricCard({ title, value, subtitle, icon, className = '', onClick, cli
     <div
       className={`rounded-lg border transition-all duration-300 ${
         isInFilters
-          ? `p-3 flex items-center gap-3 bg-gray-800 hover:bg-gray-700 ${clickable ? 'cursor-pointer hover:border-gray-500' : ''} ${isActive ? 'border-green-500 bg-green-900/30' : 'border-gray-600'}`
+          ? `p-4 flex items-center gap-4 bg-gray-800 hover:bg-gray-700 ${clickable ? 'cursor-pointer hover:border-gray-500' : ''} ${isActive ? 'border-green-500 bg-green-900/30' : 'border-gray-600'}`
           : `bg-gray-900 p-4 flex items-center gap-3 ${clickable ? 'cursor-pointer hover:bg-gray-800 hover:border-gray-600 hover:shadow-lg hover:shadow-green-500/20' : ''} ${isActive ? 'border-green-500 bg-green-900/20 shadow-lg shadow-green-500/30' : 'border-gray-700'}`
       } ${className}`}
       onClick={clickable && onClick ? onClick : undefined}
     >
-      <div className={`rounded-lg ${isInFilters ? 'p-1.5' : 'p-2'} ${isActive ? 'bg-green-600' : isInFilters ? 'bg-gray-700' : 'bg-gray-800'}`}>
-        {isActive && title !== 'Total' ? <Check className={`text-white ${isInFilters ? 'w-3 h-3' : 'w-4 h-4'}`} /> : (
-          <div className={isInFilters ? 'w-3 h-3' : 'w-4 h-4'}>
+      <div className={`rounded-lg ${isInFilters ? 'p-2' : 'p-2'} ${isActive ? 'bg-green-600' : isInFilters ? 'bg-gray-700' : 'bg-gray-800'}`}>
+        {isActive && title !== 'Total' ? <Check className={`text-white ${isInFilters ? 'w-4 h-4' : 'w-4 h-4'}`} /> : (
+          <div className={isInFilters ? 'w-4 h-4' : 'w-4 h-4'}>
             {icon}
           </div>
         )}
       </div>
       <div>
-        <p className={`${isInFilters ? 'text-lg font-bold' : 'text-2xl font-bold'} text-white`}>{value}</p>
-        <p className={`text-gray-400 ${isInFilters ? 'text-xs' : 'text-xs'}`}>{title}</p>
+        <p className={`${isInFilters ? 'text-xl font-bold' : 'text-2xl font-bold'} text-white`}>{value}</p>
+        <p className={`text-gray-400 ${isInFilters ? 'text-sm' : 'text-xs'}`}>{title}</p>
         {subtitle && !isInFilters && (
           <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
         )}
@@ -111,11 +111,11 @@ export default function DashboardMetrics({ projects, onMetricClick, activeFilter
 
   if (showInFilters) {
     return (
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4 w-full">
         <MetricCard
           title="Total"
           value={metrics.totalProjects}
-          icon={<Calendar className="w-3 h-3 text-green-400" />}
+          icon={<Calendar className="w-4 h-4 text-green-400" />}
           clickable={!!onMetricClick}
           onClick={onMetricClick ? () => onMetricClick('all') : undefined}
           isActive={isTotalActive}
@@ -125,7 +125,7 @@ export default function DashboardMetrics({ projects, onMetricClick, activeFilter
         <MetricCard
           title="En Progreso"
           value={metrics.inProgressProjects}
-          icon={<Clock className="w-3 h-3 text-yellow-400" />}
+          icon={<Clock className="w-4 h-4 text-yellow-400" />}
           clickable={!!onMetricClick}
           onClick={onMetricClick ? () => onMetricClick('in-progress') : undefined}
           isActive={isInProgressActive}
@@ -135,7 +135,7 @@ export default function DashboardMetrics({ projects, onMetricClick, activeFilter
         <MetricCard
           title="Completados"
           value={metrics.completedProjects}
-          icon={<CheckCircle className="w-3 h-3 text-lime-400" />}
+          icon={<CheckCircle className="w-4 h-4 text-lime-400" />}
           clickable={!!onMetricClick}
           onClick={onMetricClick ? () => onMetricClick('done') : undefined}
           isActive={isDoneActive}
@@ -145,7 +145,7 @@ export default function DashboardMetrics({ projects, onMetricClick, activeFilter
         <MetricCard
           title="Vencidos"
           value={metrics.overdueProjects}
-          icon={<AlertTriangle className="w-3 h-3 text-red-400" />}
+          icon={<AlertTriangle className="w-4 h-4 text-red-400" />}
           className={`filter-card ${metrics.overdueProjects > 0 ? "border-red-600 bg-red-900/20" : ""}`}
           clickable={!!onMetricClick}
           onClick={onMetricClick ? () => onMetricClick('overdue') : undefined}

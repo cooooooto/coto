@@ -452,8 +452,8 @@ export default function ProjectDetailPage() {
                 key={task.id}
                 className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
                   task.completed
-                    ? 'bg-green-50 border-green-200'
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-green-900/20 border-green-600'
+                    : 'bg-gray-800 border-gray-600 hover:bg-gray-700'
                 }`}
               >
                 <button
@@ -472,7 +472,7 @@ export default function ProjectDetailPage() {
                   )}
                 </button>
 
-                <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-gray-100'}`}>
                   {task.name}
                 </span>
 

@@ -3,6 +3,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Project } from '@/types/project';
 import DashboardMetrics from '@/components/DashboardMetrics';
 import ProjectFilters from '@/components/filters/ProjectFilters';
@@ -16,6 +17,8 @@ function HomeContent() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const searchParams = useSearchParams();
 
   const { addNotification } = useNotifications();
   const {
@@ -56,6 +59,18 @@ function HomeContent() {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Manejar parámetro de query para mostrar mensaje de éxito
+  useEffect(() => {
+    if (searchParams.get('created') === 'true') {
+      setShowSuccessMessage(true);
+      // Ocultar el mensaje después de 5 segundos
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Aplicar filtros automáticamente
   const filteredProjects = applyFilters(projects);
@@ -134,7 +149,20 @@ function HomeContent() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Componente de Filtros */}
+      {/* Mensaje de éxito */}
+      {showSuccessMessage && (
+        <div className="bg-green-900 border border-green-600 rounded-lg p-4 neon-glow-subtle">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-green-400 font-medium">¡Proyecto creado exitosamente!</span>
+          </div>
+          <p className="text-green-300 mt-1">Tu nuevo proyecto ha sido agregado al dashboard.</p>
+        </div>
+      )}
+
+      {/* Componente de Filtros con métricas integradas */}
       <ProjectFilters
         filters={filters}
         showFilters={showFilters}
@@ -142,10 +170,7 @@ function HomeContent() {
         onToggleFilters={() => setShowFilters(!showFilters)}
         onUpdateFilters={updateFilters}
         onClearFilters={clearFilters}
-      />
-
-      {/* Dashboard Metrics */}
-      <DashboardMetrics
+        showMetrics={true}
         projects={projects}
         onMetricClick={handleMetricClick}
         activeFilters={{
@@ -153,6 +178,16 @@ function HomeContent() {
           overdue: filters.overdue
         }}
       />
+
+      {/* Dashboard Metrics - Ahora están integradas en el componente de filtros */}
+      {/* <DashboardMetrics
+        projects={projects}
+        onMetricClick={handleMetricClick}
+        activeFilters={{
+          status: filters.status,
+          overdue: filters.overdue
+        }}
+      /> */}
 
       {/* Grid de Proyectos */}
       <ProjectGrid
