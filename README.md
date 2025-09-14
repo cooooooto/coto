@@ -270,6 +270,51 @@ rm data/projects.json
 - **React Hook Form** para formularios complejos
 - **Zustand** para state management global
 
+## Flujo de Trabajo Git Simplificado
+
+Este proyecto utiliza un flujo de trabajo simplificado con solo **dos ramas principales**:
+
+### **Ramas del Proyecto**
+- **`main`** → **Producción** 🚀
+  - Rama principal para despliegues en producción
+  - Código estable y probado
+  - Despliegue automático cuando se hace merge
+
+- **`desarrollo`** → **Staging** 🧪
+  - Rama de desarrollo y testing
+  - Integración de nuevas funcionalidades
+  - Ambiente de staging para pruebas
+
+### **Flujo de Trabajo Recomendado**
+
+1. **Desarrollo de nuevas funcionalidades**:
+   ```bash
+   git checkout desarrollo
+   git pull origin desarrollo
+   # Desarrollar y hacer commits
+   git push origin desarrollo
+   ```
+
+2. **Preparar para producción**:
+   ```bash
+   git checkout main
+   git pull origin main
+   git merge desarrollo
+   git push origin main
+   ```
+
+3. **Despliegue**:
+   - `main` → Producción automática
+   - `desarrollo` → Staging manual
+
+### **Reglas Importantes**
+- ✅ **Nunca** hacer commits directamente a `main`
+- ✅ **Siempre** probar en `desarrollo` antes de mergear
+- ✅ **Mantener** `main` siempre estable
+- ✅ **Usar** pull requests para revisar cambios
+
+---
+
 ## Licencia
 
 Este proyecto está bajo la licencia **MIT**. Úsalo libremente para proyectos personales o comerciales.

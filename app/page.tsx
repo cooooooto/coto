@@ -179,15 +179,6 @@ function HomeContent() {
         }}
       />
 
-      {/* Dashboard Metrics - Ahora están integradas en el componente de filtros */}
-      {/* <DashboardMetrics
-        projects={projects}
-        onMetricClick={handleMetricClick}
-        activeFilters={{
-          status: filters.status,
-          overdue: filters.overdue
-        }}
-      /> */}
 
       {/* Grid de Proyectos */}
       <ProjectGrid

@@ -18,31 +18,31 @@ export function useProjectFilters() {
   // Estado para controlar la visibilidad de los filtros
   const [showFilters, setShowFilters] = useState(false);
 
+  // Función helper para verificar filtros activos
+  const hasActiveFiltersCheck = (filterObj: ProjectFilters) =>
+    Object.values(filterObj).some(value =>
+      value !== undefined && value !== '' && value !== false
+    );
+
   // Aplicar filtros a los proyectos
   const applyFilters = (projects: Project[]) => {
     let filtered = [...projects];
-
-    // Filtro automático: ocultar proyectos completados por defecto
-    const hasActiveFilters = Object.values(filters).some(value =>
-      value !== undefined && value !== '' && value !== false
-    );
+    const hasActiveFilters = hasActiveFiltersCheck(filters);
 
     if (!hasActiveFilters) {
       // Si no hay filtros activos, ocultar proyectos completados
       filtered = filtered.filter(project => project.status !== 'Done');
     } else {
-      // Aplicar filtros activos
-      if (filters.status) {
-        filtered = filtered.filter(project => project.status === filters.status);
-      }
+      // Aplicar filtros activos usando filter con condición
+      const filterConditions = [
+        (project: Project) => !filters.status || project.status === filters.status,
+        (project: Project) => !filters.phase || project.phase === filters.phase,
+        (project: Project) => !filters.overdue || new Date() > new Date(project.deadline),
+      ];
 
-      if (filters.phase) {
-        filtered = filtered.filter(project => project.phase === filters.phase);
-      }
-
-      if (filters.overdue) {
-        filtered = filtered.filter(project => new Date() > new Date(project.deadline));
-      }
+      filtered = filtered.filter(project =>
+        filterConditions.every(condition => condition(project))
+      );
     }
 
     // Filtro por búsqueda (siempre se aplica)
@@ -83,9 +83,7 @@ export function useProjectFilters() {
   };
 
   // Verificar si hay filtros activos
-  const hasActiveFilters = Object.values(filters).some(value =>
-    value !== undefined && value !== ''
-  );
+  const hasActiveFilters = hasActiveFiltersCheck(filters);
 
   return {
     filters,

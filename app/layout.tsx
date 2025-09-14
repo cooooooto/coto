@@ -10,9 +10,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Dev Project Tracker",
-  description: "Track your full-stack development projects with ease",
+  title: "Dev Project Tracker - Gestor de Proyectos Full-Stack",
+  description: "Tracker intuitivo y moderno para gestionar proyectos de desarrollo full-stack con fases, tareas y deadlines. Construido con Next.js 15.",
+  keywords: ["project tracker", "desarrollo full-stack", "gestión proyectos", "Next.js", "TypeScript"],
+  authors: [{ name: "Dev Project Tracker" }],
+  creator: "Dev Project Tracker",
+  publisher: "Dev Project Tracker",
   manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -24,13 +39,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Dev Project Tracker",
-    title: "Dev Project Tracker",
-    description: "Track your full-stack development projects with ease",
+    title: "Dev Project Tracker - Gestor de Proyectos Full-Stack",
+    description: "Tracker intuitivo y moderno para gestionar proyectos de desarrollo full-stack con fases, tareas y deadlines.",
+    locale: "es_ES",
   },
   twitter: {
-    card: "summary",
-    title: "Dev Project Tracker", 
-    description: "Track your full-stack development projects with ease",
+    card: "summary_large_image",
+    title: "Dev Project Tracker",
+    description: "Tracker intuitivo y moderno para gestionar proyectos de desarrollo full-stack.",
+    creator: "@devprojecttracker",
   },
 };
 
@@ -42,26 +59,16 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-        <meta name="theme-color" id="theme-color-meta" content="#030712" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#030712" />
+        <meta name="color-scheme" content="dark" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="robots" content="noindex, nofollow" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                // Force dark theme only
-                document.documentElement.classList.add('dark');
-              } catch (e) {
-                console.warn('Error initializing theme:', e);
-              }
-            `,
-          }}
-        />
+        <meta name="apple-mobile-web-app-title" content="Dev Project Tracker" />
+        <meta name="application-name" content="Dev Project Tracker" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased min-h-screen transition-colors duration-300`}

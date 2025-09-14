@@ -42,122 +42,153 @@ export default function ProjectFilters({
 }: ProjectFiltersProps) {
   return (
     <div className="space-y-4">
-      {/* Layout horizontal: Nuevo Proyecto | Estadísticas | Filtros */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Nuevo Proyecto Button - Izquierda */}
-        <div className="flex-shrink-0">
-          <Link
-            href="/projects/new"
-            className="bg-green-400 hover:bg-green-500 text-gray-900 text-sm font-medium px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 font-semibold shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Proyecto
-          </Link>
-        </div>
-
-        {/* Estadísticas - Centro */}
-        <div className="flex-1 flex justify-center min-w-0">
-          {showMetrics && projects.length > 0 && (
-            <DashboardMetrics
-              projects={projects}
-              onMetricClick={onMetricClick}
-              activeFilters={activeFilters}
-              showInFilters={true}
-            />
-          )}
-        </div>
-
-        {/* Botón de Filtros - Derecha */}
-        <div className="flex-shrink-0 flex items-center gap-4">
-          <button
-            onClick={onToggleFilters}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-300 border border-gray-300 dark:border-gray-600"
-          >
-            <svg
-              className={`w-5 h-5 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      {/* Layout responsive: Móvil - Dos filas, Desktop - Una fila */}
+      <div className="space-y-4 md:space-y-0">
+        {/* Primera fila: Nuevo Proyecto + Filtros + Estadísticas (Desktop) */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Nuevo Proyecto Button */}
+          <div className="flex-shrink-0">
+            <Link
+              href="/projects/new"
+              className="bg-green-400 hover:bg-green-500 text-gray-900 text-sm font-medium px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 font-semibold shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-            <span className="font-medium">Filtros</span>
-            {hasActiveFilters && (
-              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                {Object.values(filters).filter(value => value !== undefined && value !== '').length}
-              </span>
-            )}
-          </button>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Nuevo Proyecto
+            </Link>
+          </div>
 
-          {/* Mostrar filtros activos de manera resumida */}
-          {hasActiveFilters && (
-            <div className="flex gap-2 flex-wrap">
-              {filters.search && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
-                  🔍 {filters.search.length > 15 ? `${filters.search.substring(0, 15)}...` : filters.search}
-                  <button
-                    onClick={() => onUpdateFilters({ search: undefined })}
-                    className="ml-1 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+          {/* Estadísticas - Solo Desktop */}
+          <div className="hidden md:flex flex-1 justify-center min-w-0">
+            {showMetrics && projects.length > 0 && (
+              <DashboardMetrics
+                projects={projects}
+                onMetricClick={onMetricClick}
+                activeFilters={activeFilters}
+                showInFilters={true}
+              />
+            )}
+          </div>
+
+          {/* Botón de Filtros - Derecha */}
+          <div className="flex-shrink-0 flex items-center gap-4">
+            <button
+              onClick={onToggleFilters}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-300 border border-gray-300 dark:border-gray-600"
+            >
+              <svg
+                className={`w-5 h-5 transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              <span className="font-medium">Filtros</span>
+              {hasActiveFilters && (
+                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                  {Object.values(filters).filter(value => value !== undefined && value !== '').length}
                 </span>
               )}
-              {filters.status && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs">
-                  Estado: {filters.status}
-                  <button
-                    onClick={() => onUpdateFilters({ status: undefined })}
-                    className="ml-1 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </span>
-              )}
-              {filters.phase && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full text-xs">
-                  Fase: {filters.phase}
-                  <button
-                    onClick={() => onUpdateFilters({ phase: undefined })}
-                    className="ml-1 hover:bg-orange-200 dark:hover:bg-orange-800 rounded-full p-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </span>
-              )}
-              {filters.overdue && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-xs">
-                  Solo vencidos
-                  <button
-                    onClick={() => onUpdateFilters({ overdue: undefined })}
-                    className="ml-1 hover:bg-red-200 dark:hover:bg-red-800 rounded-full p-0.5"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </span>
-              )}
+            </button>
+
+            {/* Mostrar filtros activos de manera resumida */}
+            {hasActiveFilters && (
+              <div className="flex gap-2 flex-wrap">
+                {filters.search && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
+                    🔍 {filters.search.length > 15 ? `${filters.search.substring(0, 15)}...` : filters.search}
+                    <button
+                      onClick={() => onUpdateFilters({ search: undefined })}
+                      className="ml-1 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+                {filters.status && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs">
+                    Estado: {filters.status}
+                    <button
+                      onClick={() => onUpdateFilters({ status: undefined })}
+                      className="ml-1 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+                {filters.phase && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full text-xs">
+                    Fase: {filters.phase}
+                    <button
+                      onClick={() => onUpdateFilters({ phase: undefined })}
+                      className="ml-1 hover:bg-orange-200 dark:hover:bg-orange-800 rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+                {filters.overdue && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-xs">
+                    Solo vencidos
+                    <button
+                      onClick={() => onUpdateFilters({ overdue: undefined })}
+                      className="ml-1 hover:bg-red-200 dark:hover:bg-red-800 rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Limpiar todos los filtros - Desktop */}
+            {hasActiveFilters && (
+              <div className="hidden md:block">
+                <button
+                  onClick={onClearFilters}
+                  className="text-sm text-green-400 hover:text-green-300 transition-colors"
+                >
+                  Limpiar todo
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Segunda fila: Estadísticas horizontales - Solo en móvil */}
+        <div className="md:hidden">
+          {showMetrics && projects.length > 0 && (
+            <div className="w-full">
+              <DashboardMetrics
+                projects={projects}
+                onMetricClick={onMetricClick}
+                activeFilters={activeFilters}
+                showInFilters={true}
+              />
             </div>
           )}
         </div>
 
-        {/* Limpiar todos los filtros */}
+        {/* Limpiar todos los filtros - Móvil */}
         {hasActiveFilters && (
-          <button
-            onClick={onClearFilters}
-            className="text-sm text-green-400 hover:text-green-300 transition-colors"
-          >
-            Limpiar todo
-          </button>
+          <div className="md:hidden flex justify-center">
+            <button
+              onClick={onClearFilters}
+              className="text-sm text-green-400 hover:text-green-300 transition-colors"
+            >
+              Limpiar todo
+            </button>
+          </div>
         )}
       </div>
 
