@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Project, ProjectPhase } from '@/types/project';
@@ -26,11 +26,11 @@ export default function ProjectDetailPage() {
   const [updating, setUpdating] = useState(false);
 
   // Cargar proyecto
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Proyecto no encontrado');
@@ -45,11 +45,11 @@ export default function ProjectDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
     fetchProject();
-  }, [projectId]);
+  }, [fetchProject]);
 
   // Actualizar tarea
   const handleToggleTask = async (taskId: string, completed: boolean) => {
