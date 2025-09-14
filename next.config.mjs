@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración de Turbopack
-  turbopack: {
-    root: __dirname,
-  },
   // Optimización de imágenes
   images: {
     domains: ['avatars.githubusercontent.com'],
@@ -14,4 +10,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
