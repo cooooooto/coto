@@ -1,4 +1,6 @@
 import { Project } from '@/types/project';
+import Link from 'next/link';
+import DashboardMetrics from '@/components/DashboardMetrics';
 
 interface ProjectFiltersProps {
   filters: {
@@ -17,6 +19,13 @@ interface ProjectFiltersProps {
     search?: string;
   }>) => void;
   onClearFilters: () => void;
+  showMetrics?: boolean;
+  projects?: Project[];
+  onMetricClick?: (metricType: string) => void;
+  activeFilters?: {
+    status?: Project['status'];
+    overdue?: boolean;
+  };
 }
 
 export default function ProjectFilters({
@@ -25,13 +34,43 @@ export default function ProjectFilters({
   hasActiveFilters,
   onToggleFilters,
   onUpdateFilters,
-  onClearFilters
+  onClearFilters,
+  showMetrics = false,
+  projects = [],
+  onMetricClick,
+  activeFilters
 }: ProjectFiltersProps) {
   return (
     <div className="space-y-4">
-      {/* Botón para mostrar/ocultar filtros */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
+      {/* Layout horizontal: Nuevo Proyecto | Estadísticas | Filtros */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Nuevo Proyecto Button - Izquierda */}
+        <div className="flex-shrink-0">
+          <Link
+            href="/projects/new"
+            className="bg-green-400 hover:bg-green-500 text-gray-900 text-sm font-medium px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 font-semibold shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo Proyecto
+          </Link>
+        </div>
+
+        {/* Estadísticas - Centro */}
+        <div className="flex-1 flex justify-center min-w-0">
+          {showMetrics && projects.length > 0 && (
+            <DashboardMetrics
+              projects={projects}
+              onMetricClick={onMetricClick}
+              activeFilters={activeFilters}
+              showInFilters={true}
+            />
+          )}
+        </div>
+
+        {/* Botón de Filtros - Derecha */}
+        <div className="flex-shrink-0 flex items-center gap-4">
           <button
             onClick={onToggleFilters}
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-300 border border-gray-300 dark:border-gray-600"

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
 import NotificationPermissionHandler from "@/components/NotificationPermissionHandler";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -69,7 +68,6 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <NotificationPermissionHandler />
-          <Navigation />
           <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8 max-w-7xl">
             {children}
           </main>
